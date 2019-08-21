@@ -36,10 +36,8 @@ namespace ActorSpace
             this.FreeSpace = InventorySize;
             this.InventorySize = InventorySize;
             this.TileOfActor = TileOfActor;
-        }
-
-
-
+        }      
+        
     }
 
 

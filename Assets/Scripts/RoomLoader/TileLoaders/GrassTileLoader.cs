@@ -22,7 +22,7 @@ public class GrassTileLoader : MonoBehaviour
 
     void Start()
     {
-
+        
         //Gets the position of the tile in the scene
         x = (int)(transform.position.x-0.5f);
         y = (int)(transform.position.y-0.5f);
