@@ -15,6 +15,7 @@ using UnityEngine;
 using TileSpace;
 using RoomSpace;
 using ItemSpace;
+using GenericMethods;
 
 namespace BlockSpace
 {
@@ -36,7 +37,31 @@ namespace BlockSpace
             this.Name = Name;
             this.Solid = Solid;
             this.Sprite = Sprite;
-            this.TileOfBlock = TileOfBlock;
+
+            if(Methods.CanMoveBlock(this,TileOfBlock))
+            {
+                Methods.MoveBlock(this,TileOfBlock);
+            }
+            else
+            {
+                this.TileOfBlock = null;
+            }
+
+        }
+
+        //Returns a block instance identical to this one, placed at given tile. Returns null if tile is occupied.
+        public Block Copy(Tile NewTile)
+        {
+            //Create new block instance
+            Block NewBlock = new Block(this.Name, this.Solid, this.Sprite, NewTile);
+
+            //Returns null if NewTile is already filled
+            if(!Methods.CanMoveBlock(NewBlock,NewTile))
+            {
+                return null;
+            }
+
+            return NewBlock;
         }
 
 

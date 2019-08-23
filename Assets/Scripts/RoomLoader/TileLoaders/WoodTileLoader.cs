@@ -20,7 +20,7 @@ public class WoodTileLoader : MonoBehaviour
     int x;
     int y;
 
-    void Start()
+    void Awake()
     {
 
         //Gets the position of the tile in the scene
@@ -35,7 +35,7 @@ public class WoodTileLoader : MonoBehaviour
             //Gets the SceneRoom instance from the RoomProperties script
             SceneRoom = RoomControl.GetComponent<RoomPropertiesScript>().SceneRoom;
 
-            //Creates a new Tile instance. We used Grass in this example.
+            //Creates a new Tile instance. 
             Tile = new WoodTile(SceneRoom, x, y);
 
             //Add the Tile to the array of the Room instance

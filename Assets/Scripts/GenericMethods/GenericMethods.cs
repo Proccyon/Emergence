@@ -1,4 +1,4 @@
-﻿//-----Usage-----//
+﻿ //-----Usage-----//
 //Defines most of the methods used throughout the game.
 
 //-----UnityImports-----//
@@ -26,6 +26,11 @@ namespace GenericMethods
         //Checks if an actor can move to a given tile. Returns true if possible, returns false if not possible.
         public static bool CanMoveActor(Actor Actor, Tile NewTile)
         {
+            //Return false if NewTile is set to null
+            if (NewTile == null)
+            {
+                return false;
+            }
 
             //Return false if there is a solid block at the new tile.
             if (NewTile.BlockOfTile != null && NewTile.BlockOfTile.Solid)
@@ -42,13 +47,56 @@ namespace GenericMethods
         {
             if (CanMoveActor(Actor, NewTile))
             {
-                Actor.TileOfActor.ActorOfTile = null; //Removes actor from old tile
+                //Checks if Actor was previously on a tile
+                if (Actor.TileOfActor != null)
+                { 
+                    Actor.TileOfActor.ActorOfTile = null; //Removes actor from old tile
+                }
                 Actor.TileOfActor = NewTile; //changes tile propery of the actor
                 NewTile.ActorOfTile = Actor; //changes actor property of the new tile
             }
         }
 
-        //Checks if an item can be moved to a given container. 
+        //Checks if a block can be moved to a given tile
+        public static bool CanMoveBlock(Block Block,Tile NewTile)
+        {
+            
+            //Return false if given tile is null
+            if(NewTile == null)
+            {
+                return false;
+            }
+
+            //Return false if there is an actor at the new tile and block is solid
+            if(NewTile.ActorOfTile != null && Block.Solid)
+            {
+                return false;
+            }
+
+            //Return true if NewTile contains no block, Return false if NewTile does contain a block
+            return (NewTile.BlockOfTile == null);
+
+        }
+         
+        public static void MoveBlock(Block Block, Tile NewTile)
+        {
+            //Checks if Block can indeed be moved to the new tile
+            if(CanMoveBlock(Block,NewTile))
+            {
+                if(Block.TileOfBlock != null)
+                {
+                    Block.TileOfBlock.BlockOfTile = null; //Removes block of previous tile
+                }
+                Block.TileOfBlock = NewTile; //Changes tile property of Block
+                NewTile.BlockOfTile = Block; //Changes block property of NewTile             
+
+            }
+
+        }
+
+
+
+        //Checks if an item can be moved to a given container.
         public static bool CanMoveItem(Item Item, Container NewContainer)
         {
             return (NewContainer.ItemOfContainer == null); //Checks if the target container already holds an item.
@@ -59,11 +107,18 @@ namespace GenericMethods
         {
             if (CanMoveItem(Item, NewContainer))
             {
-                Item.ContainerOfItem.ItemOfContainer = null;//Empties the container that used to hold the item.
+                if(Item.ContainerOfItem != null)
+                {
+                    Item.ContainerOfItem.ItemOfContainer = null;//Empties the container that used to hold the item.
+                }
+                
                 Item.ContainerOfItem = NewContainer; //Changes the container of the item.
                 NewContainer.ItemOfContainer = Item; //Changes the item of the new container.
             }
         }
+
+        
+
 
         //-----Sprite methods-----//
         //Methods that do something with sprites.

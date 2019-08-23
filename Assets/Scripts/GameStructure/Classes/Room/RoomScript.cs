@@ -46,6 +46,38 @@ namespace RoomSpace
 
         }
 
+        //Constructor that sets everything to null
+        public Room()
+        {
+            this.Height = 0;
+            this.Width = 0;
+            this.TileArray = null;
+        }
+
+        //Returns a new room instance that is identical to this one.
+        public Room Copy()
+        {
+            //Creates a new empty array and room
+            Tile[,] NewTileArray = new Tile[this.Width, this.Height];
+            Room NewRoom = new Room();
+
+            //Goes through all the old tiles
+            foreach(Tile OldTile in this.TileArray)
+            {
+                //Creates a copy of each tile
+                NewTileArray[OldTile.X, OldTile.Y] = OldTile.Copy(NewRoom);
+            }
+            //Sets the variables of the new room
+            NewRoom.Height = this.Height;
+            NewRoom.Width = this.Width;
+            NewRoom.TileArray = NewTileArray;
+
+            return NewRoom;
+
+        }
+
+
+        //Method that renders the room in the active scene. Will be deleted later.
         public List<GameObject> RenderRoom()
         {
 
@@ -57,13 +89,9 @@ namespace RoomSpace
             }
             return SpriteObjectList;
 
-
         }
 
-
-
     }
-
 
 }
 

@@ -56,6 +56,32 @@ namespace TileSpace
             this.BlockOfTile = null;
 
         }
+
+        //Returns a new tile instance identical to this one. NewTile is placed in given NewRoom at NewX,NewY.
+        public Tile Copy(Room NewRoom,int NewX=-1,int NewY=-1)
+        {
+            //If x or y is not given set NewX,NewY to X,Y of old tile
+            if(NewX <= 0 || NewY <= 0)
+            {
+                NewX = this.X;
+                NewY = this.Y;
+            }
+            //Create new tile
+            Tile NewTile = new Tile(NewRoom, NewX, NewY, this.FloorOfTile);
+
+            //Creates a copy of Actor and block and moves it to NewTile(if they exist)
+            if(this.ActorOfTile != null)
+            {
+                Actor NewActor = this.ActorOfTile.Copy(NewTile);
+            }
+            if (this.BlockOfTile != null)
+            {
+                Block NewBlock = this.BlockOfTile.Copy(NewTile);
+            }
+
+            return NewTile;
+
+        }
     }
 
 

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 //-----ScriptImports-----//
-
+using GenericMethods;
 
 
 namespace ItemSpace
@@ -27,14 +27,29 @@ namespace ItemSpace
         public Sprite Sprite;
 
 
-
+        //Basic constructor
         public Item(string Name, Container ContainerOfItem, Sprite Sprite)
         {
             this.Name = Name;
-            this.ContainerOfItem = ContainerOfItem;
             this.Sprite = Sprite;
+
+            //Checks if the given container is already occupied
+            if(Methods.CanMoveItem(this,ContainerOfItem))
+            {
+                Methods.MoveItem(this, ContainerOfItem); //If not then move this item to the container
+            }
+            else //If it is occupied set ContainerOfItem to null
+            {
+                this.ContainerOfItem = null;
+            }
+            
         }
 
+        //
+        public Item Copy(Container NewContainer)
+        {
+            return new Item(this.Name,NewContainer,this.Sprite);
+        }
     }
 
     //ItemOfContainer: The item the container is holding.
@@ -43,10 +58,35 @@ namespace ItemSpace
 
         public Item ItemOfContainer;
 
-        //Initializes without an item. It's probably better to add items after the container is initialized.
+        //Constructor
+        public Container(Item ItemOfContainer)
+        {
+            this.ItemOfContainer = ItemOfContainer;
+        }
+
+        //Empty contructor. Might be better to use this and add item afterwards
         public Container()
         {
             this.ItemOfContainer = null;
+        }
+
+        //Returns a new container instance identical to this one.
+        public Container Copy()
+        {
+            //Create new Container instance with no item inside
+            Container NewContainer = new Container();
+            
+            //Checks if this Container contains an item
+            if(this.ItemOfContainer == null)
+            {
+                return NewContainer; //If not return this empty container
+            }
+            else
+            {
+                //Otherwise copy the item, put it in container and return the container
+                NewContainer.ItemOfContainer = this.ItemOfContainer.Copy(NewContainer);
+                return NewContainer;
+            }
         }
 
     }

@@ -20,7 +20,7 @@ public class RoadTileLoader : MonoBehaviour
     int x;
     int y;
 
-    void Start()
+    void Awake()
     {
 
         //Gets the position of the tile in the scene

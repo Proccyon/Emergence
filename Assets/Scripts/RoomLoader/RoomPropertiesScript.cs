@@ -19,32 +19,10 @@ public class RoomPropertiesScript : MonoBehaviour
     public Room SceneRoom; //The Room instance.
     public List<GameObject> ObjectList;
 
-
-
+    //This should run before the Awake() of the TileLoaders. (set in Script Execution Order)
     void Awake()
     {
-        SceneRoom = new Room(RoomHeight, RoomWidth); //Creates room with empty grass tiles       
+        SceneRoom = new Room(RoomHeight, RoomWidth);
     }
 
-    void Start()
-    {
-
-        ObjectList = SceneRoom.RenderRoom();
-
-
-    }
-
-    void Update()
-    {
-
-
-
-        foreach (GameObject SpriteObject in ObjectList)
-        {
-            GameObject.Destroy(SpriteObject);
-        }
-
-         ObjectList = SceneRoom.RenderRoom();
-
-    }
 }

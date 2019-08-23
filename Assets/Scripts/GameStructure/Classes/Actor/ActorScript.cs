@@ -11,6 +11,7 @@ using UnityEngine;
 using TileSpace;
 using RoomSpace;
 using ItemSpace;
+using GenericMethods;
 
 namespace ActorSpace
 {
@@ -25,18 +26,52 @@ namespace ActorSpace
         public string Name;
         public Container[] Inventory;
         public int InventorySize;
-        public int FreeSpace;
         public Tile TileOfActor;
 
         //Initializes an actor with an empty inventory. It's safer to add items after initialization.
         public Actor(string Name, int InventorySize, Tile TileOfActor)
         {
             this.Name = Name;
-            this.Inventory = new Container[InventorySize];
-            this.FreeSpace = InventorySize;
             this.InventorySize = InventorySize;
-            this.TileOfActor = TileOfActor;
-        }      
+            this.Inventory = new Container[InventorySize];
+            //Fils inventory with empty containers
+            for (int i = 0; i < InventorySize; i++)
+            {
+                Inventory[i] = new Container();
+            }
+
+            if (Methods.CanMoveActor(this, TileOfActor))
+            {
+                Methods.MoveActor(this, TileOfActor);
+            }
+            else
+            {
+                this.TileOfActor = null;
+            }   
+            
+        }
+       
+
+        //Returns a new Actor instance identical to this one, placed on NewTile
+        public Actor Copy(Tile NewTile)
+        {
+            //Create New actor instance
+            Actor NewActor = new Actor(this.Name, this.InventorySize, NewTile);
+
+            //Checks if NewTile can hold this actor, otherwise return null
+            if(!Methods.CanMoveActor(NewActor,NewTile))
+            {
+                return null;
+            }
+
+            //Copy all containers in the old inventory
+            for (int i = 0; i < this.InventorySize; i++)
+            {
+                NewActor.Inventory[i] = this.Inventory[i].Copy();
+            }
+            return NewActor;
+            
+        }
         
     }
 

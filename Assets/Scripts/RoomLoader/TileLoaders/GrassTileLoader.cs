@@ -20,12 +20,12 @@ public class GrassTileLoader : MonoBehaviour
     int x;
     int y;
 
-    void Start()
+    void Awake()
     {
         
         //Gets the position of the tile in the scene
-        x = (int)(transform.position.x-0.5f);
-        y = (int)(transform.position.y-0.5f);
+        x = (int)(transform.position.x - 0.5f);
+        y = (int)(transform.position.y - 0.5f);
 
         //Finds the RoomControl GameObject by name
         RoomControl = GameObject.Find("RoomControl");
@@ -34,7 +34,7 @@ public class GrassTileLoader : MonoBehaviour
         {
             //Gets the SceneRoom instance from the RoomProperties script
             SceneRoom = RoomControl.GetComponent<RoomPropertiesScript>().SceneRoom;
-
+            
             //Creates a new Tile instance.
             Tile = new GrassTile(SceneRoom, x, y);
 
@@ -47,8 +47,6 @@ public class GrassTileLoader : MonoBehaviour
         Destroy(gameObject);
 
     }
-
-
 
 
 }
