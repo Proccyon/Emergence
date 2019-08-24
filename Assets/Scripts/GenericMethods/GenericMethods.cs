@@ -11,6 +11,7 @@ using TileSpace;
 using ActorSpace;
 using BlockSpace;
 using ItemSpace;
+using RoomSpace;
 
 namespace GenericMethods
 {
@@ -145,6 +146,25 @@ namespace GenericMethods
             //Adjust the scale so sprite is 100 by 100
             SpriteObject.transform.localScale *= 100 / Sprite.rect.width;
             return SpriteObject;
+        }
+
+        //-----OtherMethods-----//
+        //Methods that do not fit a category
+
+        //Make a copy of a tile array and set the room of all the tiles to TargetRoom
+        public static Tile[,] CopyTileArray(Tile[,] TileArray, Room TargetRoom)
+        {
+            //Creates a new empty array
+            Tile[,] NewTileArray = new Tile[TileArray.GetLength(0), TileArray.GetLength(1)];
+
+            //Goes through all the old tiles
+            foreach (Tile OldTile in TileArray)
+            {
+                //Creates a copy of each tile
+                NewTileArray[OldTile.X, OldTile.Y] = OldTile.Copy(TargetRoom);
+            }
+
+            return NewTileArray;
         }
 
     }

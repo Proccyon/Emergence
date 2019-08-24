@@ -11,7 +11,7 @@ using RoomSpace;
 using TileSpace;
 using ActorSpace;
 
-public class RoomPropertiesScript : MonoBehaviour
+public class StructurePropertiesScript : MonoBehaviour
 {
 
     public int RoomHeight; //The heigth of the room. Is set in the editor.

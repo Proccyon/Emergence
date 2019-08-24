@@ -28,12 +28,12 @@ public class RoadTileLoader : MonoBehaviour
         y = (int)(transform.position.y - 0.5f);
 
         //Finds the RoomControl GameObject by name
-        RoomControl = GameObject.Find("RoomControl");
+        RoomControl = GameObject.Find("StructureControl");
 
         if (RoomControl != null)
         {
             //Gets the SceneRoom instance from the RoomProperties script
-            SceneRoom = RoomControl.GetComponent<RoomPropertiesScript>().SceneRoom;
+            SceneRoom = RoomControl.GetComponent<StructurePropertiesScript>().SceneRoom;
 
             //Creates a new Tile instance.
             Tile = new RoadTile(SceneRoom, x, y);

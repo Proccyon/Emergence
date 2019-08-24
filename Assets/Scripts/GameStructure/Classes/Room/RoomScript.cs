@@ -12,18 +12,28 @@ using UnityEngine;
 //-----ScriptImports-----//
 using TileSpace;
 using GenericMethods;
+using StructureSpace;
 
 namespace RoomSpace
 {
 
     //Heigt: The vertical length of the room in tiles. Height = 4 implies the room is 4 tiles high.
     //Width: The horizontal length of the room in tiles. Width = 4 implies the room is 4 tiles wide.
-    //TileArray: A 2D array that holds all the tiles in the game.  This array will either be generated or read from a custom made scene. It is left empty for now. 
+    //TileArray: A 2D array that holds the tiles in the room.  This array will either be generated or read from a custom made scene. 
     public class Room
     {
         public int Height;
         public int Width;
         public Tile[,] TileArray;
+
+        //Main constructor, Makes a room based on a (readonly) structure instance
+        public Room (Structure Structure)
+        {
+            this.Height = Structure.Height;
+            this.Width = Structure.Width;
+            this.TileArray = Methods.CopyTileArray(Structure.TileArray, this);
+        }
+
 
         //Creates an empty room of size (Width,Height) and fills it with grass tiles
         public Room(int Height, int Width)
@@ -54,23 +64,19 @@ namespace RoomSpace
             this.TileArray = null;
         }
 
+        
+
         //Returns a new room instance that is identical to this one.
         public Room Copy()
         {
-            //Creates a new empty array and room
-            Tile[,] NewTileArray = new Tile[this.Width, this.Height];
+            //Creates a new empty room
+
             Room NewRoom = new Room();
 
-            //Goes through all the old tiles
-            foreach(Tile OldTile in this.TileArray)
-            {
-                //Creates a copy of each tile
-                NewTileArray[OldTile.X, OldTile.Y] = OldTile.Copy(NewRoom);
-            }
             //Sets the variables of the new room
             NewRoom.Height = this.Height;
             NewRoom.Width = this.Width;
-            NewRoom.TileArray = NewTileArray;
+            NewRoom.TileArray = Methods.CopyTileArray(this.TileArray, NewRoom);
 
             return NewRoom;
 

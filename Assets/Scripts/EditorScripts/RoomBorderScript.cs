@@ -82,8 +82,8 @@ public class RoomBorderScript : MonoBehaviour
         if (!EditorApplication.isPlaying)
         {
 
-            int RoomHeight = gameObject.GetComponent<RoomPropertiesScript>().RoomHeight;
-            int RoomWidth = gameObject.GetComponent<RoomPropertiesScript>().RoomWidth;
+            int RoomHeight = gameObject.GetComponent<StructurePropertiesScript>().RoomHeight;
+            int RoomWidth = gameObject.GetComponent<StructurePropertiesScript>().RoomWidth;
 
             //Creates borders at the correct positions.
             CreateBorder(-0.5, (double)RoomHeight / 2, 1, RoomHeight + 2, "LeftRoomBorder");
