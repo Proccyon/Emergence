@@ -12,6 +12,7 @@ using ActorSpace;
 using BlockSpace;
 using ItemSpace;
 using RoomSpace;
+using StructureSpace;
 
 namespace GenericMethods
 {
@@ -128,13 +129,13 @@ namespace GenericMethods
         //The png file should be in the "Recources" folder otherwise it gives a nullpointer exception.
         //Path is NOT just the path given when clicking "copy path" on an asset. Remove parts like this
         //Assets/Resources/Sprites/FloorSprites/GrassFloor.png ---> Sprites/FloorSprites/GrassFloor
-
         public static Sprite LoadSprite(string Path)
         {
             Texture2D MyTexture = Resources.Load(Path) as Texture2D;
             return Sprite.Create(MyTexture, new Rect(0, 0, MyTexture.width, MyTexture.height), new Vector2(0.5f, 0.5f));
         }
 
+        //Creates a gameObject with the Sprite Sprite at position x,y
         public static GameObject CreateSpriteObject(Sprite Sprite,float x,float y)
         {
             
@@ -166,6 +167,34 @@ namespace GenericMethods
 
             return NewTileArray;
         }
+
+        //Places a tile instance in the TileArray of the StructureControl in the scene. Used in GrassTileLoader etc.
+        public static void SentTileToArray(Tile Tile, Component LoaderScript)
+        {
+            //Gets the position of the tile in the scene
+            int x = (int)(LoaderScript.gameObject.transform.position.x - 0.5f);
+            int y = (int)(LoaderScript.gameObject.transform.position.y - 0.5f);
+
+            Tile.X = x;
+            Tile.Y = y;
+
+            //Finds the RoomControl GameObject by name
+            GameObject StructureControl = GameObject.Find("StructureControl");
+
+            if (StructureControl != null)
+            {
+                //Gets the SceneRoom instance from the RoomProperties script
+                Structure SceneStructure = StructureControl.GetComponent<StructurePropertiesScript>().SceneStructure;
+
+                //Add the Tile to the array of the Room instance
+                SceneStructure.TileArray[x, y] = Tile;
+
+            }
+
+            //Destroys itself. A new GameObject will only be drawn if inside the camera (probably).
+            MonoBehaviour.Destroy(LoaderScript.gameObject);
+        }
+
 
     }
 }

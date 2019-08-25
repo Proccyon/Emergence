@@ -2,6 +2,7 @@
 //Defines the Structure class. Structures are read only versions of rooms. The objects in certain scenes will be read and turned into an instance of a scene.
 //Rooms can be initialized using a structure. Structures are meant to be copied and placed inside a room. For example
 //a Tree structure which consists of multiple blocks and tiles can be placed into a room multiple times.
+//Variables of a structure should be readonly but the way scenes work dont allow it.
 
 //-----UnityImports-----//
 using System.Collections;
@@ -19,10 +20,11 @@ namespace StructureSpace
     //TileArray: A 2D array that holds the tiles in the structure. Same as in the room class.  
     public class Structure
     {
-        public readonly int Height;
-        public readonly int Width;
-        public readonly Tile[,] TileArray; //Readonly arrays dont work. TileArray[0,0] = x is still posible. We need it to work this way.
+        public int Height;
+        public int Width;
+        public Tile[,] TileArray; //Readonly arrays dont work. TileArray[0,0] = x is still posible. We need it to work this way.
 
+        //Constructor that fills the structure with empty grass tiles
         public Structure(int Height, int Width)
         {
             this.Height = Height;
@@ -40,6 +42,14 @@ namespace StructureSpace
                 }
 
             }
+        }
+
+        //Empty constructor
+        public Structure()
+        {
+            this.Height = 0;
+            this.Width = 0;
+            this.TileArray = null;
         }
 
 

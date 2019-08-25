@@ -13,7 +13,7 @@ using BlockSpace;
 
 public class GrassTile : Tile
 {
-    public GrassTile(Room RoomOfTile, int X, int Y, Actor ActorOfTile = null, Block BlockOfTile = null)
+    public GrassTile(Room RoomOfTile = null, int X = 0, int Y = 0, Actor ActorOfTile = null, Block BlockOfTile = null)
     {
         this.RoomOfTile = RoomOfTile;
         this.X = X;
