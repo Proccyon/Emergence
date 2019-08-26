@@ -22,6 +22,7 @@ public class RoadTile : Tile
         this.BlockOfTile = BlockOfTile;
 
         this.FloorOfTile = Floor.RoadFloor;
+        this.Name = "RoadTile";
     }
 
 }

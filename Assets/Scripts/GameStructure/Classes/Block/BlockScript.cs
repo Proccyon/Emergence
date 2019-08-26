@@ -31,7 +31,7 @@ namespace BlockSpace
         public Sprite Sprite;
         public Tile TileOfBlock;
 
-        
+        //Main constructor
         public Block(string Name, bool Solid, Sprite Sprite, Tile TileOfBlock)
         {
             this.Name = Name;
@@ -47,6 +47,15 @@ namespace BlockSpace
                 this.TileOfBlock = null;
             }
 
+        }
+
+        //Empty Constructor
+        public Block()
+        {
+            this.Name = "";
+            this.Solid = false;
+            this.Sprite = null;
+            this.TileOfBlock = null;
         }
 
         //Returns a block instance identical to this one, placed at given tile. Returns null if tile is occupied.

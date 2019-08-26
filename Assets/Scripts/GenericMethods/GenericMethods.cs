@@ -136,13 +136,14 @@ namespace GenericMethods
         }
 
         //Creates a gameObject with the Sprite Sprite at position x,y
-        public static GameObject CreateSpriteObject(Sprite Sprite,float x,float y)
+        public static GameObject CreateSpriteObject(Sprite Sprite,float x,float y,string Name = "SpriteObject",int SortingOrder = 0)
         {
             
-            GameObject SpriteObject = new GameObject("SpriteObject");
+            GameObject SpriteObject = new GameObject(Name);
             SpriteObject.transform.position = new Vector3(x, y, 0);//Set position
             SpriteRenderer Renderer = SpriteObject.AddComponent<SpriteRenderer>(); //Add Sprite renderer
             Renderer.sprite = Sprite; //Set sprite
+            Renderer.sortingOrder = SortingOrder; //Sorting order is the height of the draw layer
 
             //Adjust the scale so sprite is 100 by 100
             SpriteObject.transform.localScale *= 100 / Sprite.rect.width;
@@ -168,6 +169,8 @@ namespace GenericMethods
             return NewTileArray;
         }
 
+        //-----LoaderMethods-----//
+
         //Places a tile instance in the TileArray of the StructureControl in the scene. Used in GrassTileLoader etc.
         public static void SentTileToArray(Tile Tile, Component LoaderScript)
         {
@@ -186,13 +189,75 @@ namespace GenericMethods
                 //Gets the SceneRoom instance from the RoomProperties script
                 Structure SceneStructure = StructureControl.GetComponent<StructurePropertiesScript>().SceneStructure;
 
-                //Add the Tile to the array of the Room instance
+                //Finds the actor and block already present in the structure
+                Actor OldActor = SceneStructure.TileArray[x, y].ActorOfTile;
+                Block OldBlock = SceneStructure.TileArray[x, y].BlockOfTile;
+
+                if (OldActor != null )
+                {
+                    //If there was already an actor on the tile (due to wrong load order) move it to correct tile
+                    Methods.MoveActor(OldActor, Tile);
+                }
+
+                if(OldBlock != null)
+                {
+                    //If there was already a block on the tile (due to wrong load order) move it to correct tile
+                    Methods.MoveBlock(OldBlock, Tile);
+                }
+
+                //Add the Tile to the array of the Structure instance
                 SceneStructure.TileArray[x, y] = Tile;
 
             }
 
             //Destroys itself. A new GameObject will only be drawn if inside the camera (probably).
             MonoBehaviour.Destroy(LoaderScript.gameObject);
+        }
+
+        //Places an actor instance on a tile in the TileArray of the StructureControl in the scene. Used in ChickenLoader etc.
+        public static void SentActorToArray(Actor Actor, Component LoaderScript)
+        {
+
+            //Gets the position of the tile in the scene
+            int x = (int)(LoaderScript.gameObject.transform.position.x - 0.5f);
+            int y = (int)(LoaderScript.gameObject.transform.position.y - 0.5f);
+
+            //Finds the RoomControl GameObject by name
+            GameObject StructureControl = GameObject.Find("StructureControl");
+
+            if (StructureControl != null)
+            {
+                //Gets the SceneRoom instance from the RoomProperties script
+                Structure SceneStructure = StructureControl.GetComponent<StructurePropertiesScript>().SceneStructure;
+
+                //Finds tile the actor is standing on and move Actor to it
+                Methods.MoveActor(Actor, SceneStructure.TileArray[x, y]);
+
+            }
+
+        }
+
+        //Places an Block instance on a tile in the TileArray of the StructureControl in the scene. Used in FLowerLoader etc.
+        public static void SentBlockToArray(Block Block, Component LoaderScript)
+        {
+
+            //Gets the position of the tile in the scene
+            int x = (int)(LoaderScript.gameObject.transform.position.x - 0.5f);
+            int y = (int)(LoaderScript.gameObject.transform.position.y - 0.5f);
+
+            //Finds the RoomControl GameObject by name
+            GameObject StructureControl = GameObject.Find("StructureControl");
+
+            if (StructureControl != null)
+            {
+                //Gets the SceneRoom instance from the RoomProperties script
+                Structure SceneStructure = StructureControl.GetComponent<StructurePropertiesScript>().SceneStructure;
+
+                //Finds tile the actor is standing on and move Actor to it
+                Methods.MoveBlock(Block, SceneStructure.TileArray[x, y]);
+
+            }
+
         }
 
 

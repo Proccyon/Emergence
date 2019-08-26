@@ -33,9 +33,10 @@ namespace TileSpace
         public Floor FloorOfTile;
         public Actor ActorOfTile;
         public Block BlockOfTile;
+        public string Name;
 
         //Main constructor when Tile is added to a room. 
-        public Tile(Room RoomOfTile, int X,int Y, Floor FloorOfTile, Actor ActorOfTile=null, Block BlockOfTile=null)
+        public Tile(Room RoomOfTile, int X,int Y, Floor FloorOfTile, string Name = "", Actor ActorOfTile=null, Block BlockOfTile=null)
         {
             this.RoomOfTile = RoomOfTile;
             this.X = X;
@@ -43,6 +44,7 @@ namespace TileSpace
             this.FloorOfTile = FloorOfTile;
             this.ActorOfTile = ActorOfTile;
             this.BlockOfTile = BlockOfTile;
+            this.Name = Name;
 
         }
 
@@ -55,6 +57,7 @@ namespace TileSpace
             this.FloorOfTile = Floor.WoodFloor;
             this.ActorOfTile = null;
             this.BlockOfTile = null;
+            this.Name = "";
 
         }
 
@@ -68,7 +71,7 @@ namespace TileSpace
                 NewY = this.Y;
             }
             //Create new tile
-            Tile NewTile = new Tile(NewRoom, NewX, NewY, this.FloorOfTile);
+            Tile NewTile = new Tile(NewRoom, NewX, NewY, this.FloorOfTile,this.Name);
 
             //Creates a copy of Actor and block and moves it to NewTile(if they exist)
             if(this.ActorOfTile != null)

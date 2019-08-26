@@ -24,14 +24,16 @@ namespace ActorSpace
     public class Actor
     {
         public string Name;
+        public Sprite Sprite;
         public Container[] Inventory;
         public int InventorySize;
         public Tile TileOfActor;
-
+        
         //Initializes an actor with an empty inventory. It's safer to add items after initialization.
-        public Actor(string Name, int InventorySize, Tile TileOfActor)
+        public Actor(string Name, Sprite Sprite, int InventorySize, Tile TileOfActor)
         {
             this.Name = Name;
+            this.Sprite = Sprite;
             this.InventorySize = InventorySize;
             this.Inventory = new Container[InventorySize];
             //Fils inventory with empty containers
@@ -51,12 +53,21 @@ namespace ActorSpace
             
         }
        
+        public Actor()
+        {
+            this.Name = "";
+            this.Sprite = null;
+            this.InventorySize = 0;
+            this.TileOfActor = null;
+            this.Inventory = new Container[0];
+
+        }
 
         //Returns a new Actor instance identical to this one, placed on NewTile
         public Actor Copy(Tile NewTile)
         {
             //Create New actor instance
-            Actor NewActor = new Actor(this.Name, this.InventorySize, NewTile);
+            Actor NewActor = new Actor(this.Name,this.Sprite, this.InventorySize, NewTile);
 
             //Checks if NewTile can hold this actor, otherwise return null
             if(!Methods.CanMoveActor(NewActor,NewTile))

@@ -13,6 +13,7 @@ using UnityEngine;
 using TileSpace;
 using GenericMethods;
 using StructureSpace;
+using ActorSpace;
 
 namespace RoomSpace
 {
@@ -82,6 +83,20 @@ namespace RoomSpace
 
         }
 
+        //Returns a list of all actors in the room
+        public List<Actor> GetActorList()
+        {
+
+            List<Actor> ActorList = new List<Actor>();
+            foreach(Tile Tile in this.TileArray)
+            {
+                if(Tile.ActorOfTile != null)
+                {
+                    ActorList.Add(Tile.ActorOfTile);
+                }
+            }
+            return ActorList;
+        }
 
         //Method that renders the room in the active scene. Will be deleted later.
         public List<GameObject> RenderRoom()
@@ -91,7 +106,16 @@ namespace RoomSpace
 
             foreach (Tile Tile in this.TileArray)
             {
-                SpriteObjectList.Add(Methods.CreateSpriteObject(Tile.FloorOfTile.Sprite, Tile.X+0.5f, Tile.Y+0.5f));
+                SpriteObjectList.Add(Methods.CreateSpriteObject(Tile.FloorOfTile.Sprite, Tile.X+0.5f, Tile.Y+0.5f,Tile.Name));
+                if(Tile.ActorOfTile != null)
+                {
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(Tile.ActorOfTile.Sprite, Tile.X + 0.5f, Tile.Y + 0.5f,Tile.ActorOfTile.Name,2));
+                }
+                if (Tile.BlockOfTile != null)
+                {
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(Tile.BlockOfTile.Sprite, Tile.X + 0.5f, Tile.Y + 0.5f, Tile.BlockOfTile.Name, 1));
+                }
+
             }
             return SpriteObjectList;
 

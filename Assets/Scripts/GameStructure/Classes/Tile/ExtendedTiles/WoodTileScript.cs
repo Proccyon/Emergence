@@ -22,6 +22,7 @@ public class WoodTile : Tile
         this.BlockOfTile = BlockOfTile;
 
         this.FloorOfTile = Floor.WoodFloor;
+        this.Name = "WoodTile";
     }
 
 }

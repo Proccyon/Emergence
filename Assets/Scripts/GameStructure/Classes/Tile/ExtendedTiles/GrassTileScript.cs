@@ -22,6 +22,7 @@ public class GrassTile : Tile
         this.BlockOfTile = BlockOfTile;
 
         this.FloorOfTile = Floor.GrassFloor;
+        this.Name = "GrassTile";
     }
 
 }
