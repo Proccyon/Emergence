@@ -10,6 +10,7 @@ using UnityEngine;
 using BlockSpace;
 using TileSpace;
 using GenericMethods;
+using WrapperSpace;
 
 namespace BlockSpace
 {
@@ -20,6 +21,7 @@ namespace BlockSpace
         {
             this.Name = "Flower";
             this.Solid = false;
+            this.IsActive = true;
             this.Sprite = Methods.LoadSprite("Sprites/BlockSprites/Flowers");
 
             if (Methods.CanMoveBlock(this, TileOfBlock))
@@ -30,6 +32,17 @@ namespace BlockSpace
             {
                 this.TileOfBlock = null;
             }
+
+            //Add instance to list
+            if (IsActive && TileOfBlock != null)
+            {
+                this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
+            }
+        }
+
+        public override void Behaviour()
+        {
+
         }
 
     }

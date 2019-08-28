@@ -1,5 +1,5 @@
-﻿//-----Usage-----//
-//Defines the action class. Each actor has an amount of energy each turn which it can spend on performing actions.
+﻿ //-----Usage-----//
+//Defines the Action class. Each actor has an amount of energy each turn which it can spend on performing actions.
 //Actions are things like walking, picking up an item or attacking another actor. This class is made to prevent bugs like actors teleporting over the map.
 
 

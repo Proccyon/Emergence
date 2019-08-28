@@ -11,15 +11,20 @@ using UnityEngine;
 using TileSpace;
 using RoomSpace;
 using ItemSpace;
+using WrapperSpace;
+using ActionSpace;
 using GenericMethods;
 
 namespace ActorSpace
 {
 
     //Name: Name of the Actor.
+    //Sprite: The image belonging to the actor
     //Inventory: An array of containers. Each container holds a single item.
     //InventorySize: The maximum amount of items a character can carry. Expected to remain constant
-    //FreeSpace: Current amount of free inventory slots of the character.
+    //MaxEnergy: The amount of energy this actor can spend each turn on performing actions.
+    //Energy: The current amount of energy. Each turn actors can perform actions untill this variable reaches 0.
+    //TurnNumber: The order in which actors and active blocks use Behaviour. 0 is first, highest TurnNumber is last.
     //TileOfActor: The Tile the actor is standing on.
     public class Actor
     {
@@ -27,14 +32,20 @@ namespace ActorSpace
         public Sprite Sprite;
         public Container[] Inventory;
         public int InventorySize;
+        public float MaxEnergy;
+        public float Energy;
+        public int TurnNumber;
         public Tile TileOfActor;
         
+        
         //Initializes an actor with an empty inventory. It's safer to add items after initialization.
-        public Actor(string Name, Sprite Sprite, int InventorySize, Tile TileOfActor)
+        public Actor(string Name, Sprite Sprite, int InventorySize,float MaxEnergy, Tile TileOfActor)
         {
             this.Name = Name;
             this.Sprite = Sprite;
             this.InventorySize = InventorySize;
+            this.MaxEnergy = MaxEnergy;
+            this.Energy = MaxEnergy;
             this.Inventory = new Container[InventorySize];
             //Fils inventory with empty containers
             for (int i = 0; i < InventorySize; i++)
@@ -42,6 +53,7 @@ namespace ActorSpace
                 Inventory[i] = new Container();
             }
 
+            //Moves actor to the given tile if possible
             if (Methods.CanMoveActor(this, TileOfActor))
             {
                 Methods.MoveActor(this, TileOfActor);
@@ -51,6 +63,13 @@ namespace ActorSpace
                 this.TileOfActor = null;
             }   
             
+            //If given tile is in a room, add actor to list that runs behaviour each turn
+            if(TileOfActor.RoomOfTile != null)
+            {
+                //AddRandom returns the position where the actor is placed
+                this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
+            }
+
         }
        
         public Actor()
@@ -58,6 +77,8 @@ namespace ActorSpace
             this.Name = "";
             this.Sprite = null;
             this.InventorySize = 0;
+            this.MaxEnergy = 0f;
+            this.Energy = 0f;
             this.TileOfActor = null;
             this.Inventory = new Container[0];
 
@@ -67,7 +88,7 @@ namespace ActorSpace
         public Actor Copy(Tile NewTile)
         {
             //Create New actor instance
-            Actor NewActor = new Actor(this.Name,this.Sprite, this.InventorySize, NewTile);
+            Actor NewActor = new Actor(this.Name,this.Sprite, this.InventorySize,MaxEnergy, NewTile);
 
             //Checks if NewTile can hold this actor, otherwise return null
             if(!Methods.CanMoveActor(NewActor,NewTile))
@@ -82,6 +103,12 @@ namespace ActorSpace
             }
             return NewActor;
             
+        }
+
+        //This method is ran each turn by all actors. Actors will have to overload it.
+        public virtual Action Behaviour()
+        {
+            return null;
         }
         
     }

@@ -8,21 +8,73 @@ using UnityEngine;
 //-----GameImports-----//
 using RoomSpace;
 using ActorSpace;
+using TileSpace;
+using BlockSpace;
+using ActionSpace;
+using WrapperSpace;
+
+
+namespace WrapperSpace
+{
+    //Class that is used so that actors and blocks can be in the same list
+    public class ObjectWrapper
+    {
+        public Actor Actor;
+        public Block Block;
+
+        public ObjectWrapper(Actor Actor)
+        {
+            this.Actor = Actor;
+            this.Block = null;
+        }
+
+        public ObjectWrapper(Block Block)
+        {
+            this.Block = Block;
+            this.Actor = null;
+
+        }
+    }
+
+    //Adds an ObjectWrapper instance to a random position in a list
+    public static class MyExtensions
+    {
+        public static int AddRandom(this List<ObjectWrapper> WrapperList, ObjectWrapper NewWrapper)
+        {
+            int RandomInt = (int)(Random.Range(0, WrapperList.Count + 1));
+            WrapperList.Insert(RandomInt, NewWrapper);
+
+            if(RoomRunner.IsRunning && RandomInt <= RoomRunner.RunCount) 
+            {
+                RoomRunner.RunCount += 1;
+            }
+
+            return RandomInt;
+        }
+    }
+
+}
+
+
 
 public class RoomRunner : MonoBehaviour
 {
 
 
-    public static List<Actor> ActorList = new List<Actor>();
-    public static List<Room> RoomList =  new List<Room>();
-    public static Room ActiveRoom;
-    public List<GameObject> SpriteList = new List<GameObject>();
+    public static List<ObjectWrapper> WrapperList = new List<ObjectWrapper>();//List of all actors and active blocks wrapped in a wrapper
+    public static List<Room> RoomList =  new List<Room>(); //List of all existing rooms
+    public List<GameObject> SpriteList = new List<GameObject>(); //List of all drawn sprite objects
+    public static Room ActiveRoom; //The Room that is currently being drawn
+    public static int RunCount = 0; //When running a turn, this is the 'i' equivalent of the for loop. It's static so AddRandom can acces it.
+    public static bool IsRunning = false; //Wheter or not DoTurn is running
+    public static int ActionLimit = 100; //Max amount of actions allowed to perform per turn
 
     void Start()
     {
-        RoomList.Add(new Room(StructureLoader.OverworldStructure));
-        ActiveRoom = RoomList[0];
-        List<GameObject> SpriteList = ActiveRoom.RenderRoom();
+        RoomList.Add(new Room(StructureLoader.OverworldStructure)); //Add a room based on the overworld structure. Will add more rooms later
+        ActiveRoom = RoomList[0];//Set the room that is being drawn. Later on this will depend on the player.
+
+        List<GameObject> SpriteList = ActiveRoom.RenderRoom(); //Draws the room. Destroy all objects in this List before redrawing
     }
 
 
@@ -34,5 +86,86 @@ public class RoomRunner : MonoBehaviour
         //    Destroy(Sprite);
         //}
         //List<GameObject> SpriteList = ActiveRoom.RenderRoom();
+    }
+
+
+
+    //Runs .Behaviour method for all actors and active blocks. These are stored in WrapperList
+    public void DoTurn()
+    {
+        int ActionCount = 0; //Used to prevent endless loop
+        IsRunning = true; //Might read this in other scripts
+
+        for(RunCount = 0; RunCount < WrapperList.Count; RunCount++) //Goes through WrapperList
+        {
+            ObjectWrapper Wrapper = WrapperList[RunCount]; //Convenience
+
+            //Remove Wrapper from list if it contains no blocks or actors
+            if((Wrapper.Actor == null && Wrapper.Block == null)) 
+            {
+                WrapperList.RemoveAt(RunCount);
+                RunCount -= 1;
+                break;
+            }
+
+            if(Wrapper.Actor != null)
+            {
+                //Removes wrapper from list if TileOfActor is not set consistently (this happens when actors die, WrapperList will be the only reference to the actor)
+                if(Wrapper.Actor.TileOfActor == null || Wrapper.Actor.TileOfActor.ActorOfTile != Wrapper.Actor)
+                {
+                    WrapperList.RemoveAt(RunCount);
+                    RunCount -= 1;
+                    break;
+                }
+
+                ActionCount = 0; 
+                Wrapper.Actor.TurnNumber = RunCount;
+
+                //Keep running .Behaviour untill energy runs out
+                while(Wrapper.Actor.Energy > 0)
+                {
+                    //Prevents endless loop, some actions might not cost energy
+                    if(ActionCount >= ActionLimit)
+                    {
+                        break;
+                    }
+
+                    //Runs .Behaviour to get the action the actor wants to perform
+                    Action NewAction = Wrapper.Actor.Behaviour();
+
+                    //Checks if Actor has enought energy and nothing is preventing the action. Actors should check this themselves, this just prevents bugs
+                    if(NewAction.EnergyCost <= Wrapper.Actor.Energy && NewAction.CanActivate(Wrapper.Actor))
+                    {
+                        //Performs the action
+                        NewAction.Activate(Wrapper.Actor);
+                        Wrapper.Actor.Energy -= NewAction.EnergyCost;
+                    }
+                    else
+                    {
+                        //Sends a message so the bug can be found
+                        print(Wrapper.Actor.Name +" instance returned action that could not be activated!");
+                        break;
+                    }
+                    ActionCount += 1;
+                }
+            }
+
+            //Blocks have no Action equivalent. .Behaviour does stuff itself
+            if(Wrapper.Block != null)
+            {
+                //Removes wrapper from list if TileOfBlock is not set consistently (this happens when blocks get destroyed, WrapperList will be the only reference to the block)
+                if (Wrapper.Block.TileOfBlock == null || Wrapper.Block.TileOfBlock.BlockOfTile != Wrapper.Block)
+                {
+                    WrapperList.RemoveAt(RunCount);
+                    RunCount -= 1;
+                    break;
+                }
+
+                Wrapper.Block.TurnNumber = RunCount;
+                Wrapper.Block.Behaviour();
+            }
+        }
+        IsRunning = false;
+
     }
 }

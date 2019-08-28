@@ -10,6 +10,7 @@ using UnityEngine;
 using TileSpace;
 using ItemSpace;
 using GenericMethods;
+using WrapperSpace;
 
 namespace ActorSpace
 {
@@ -24,6 +25,8 @@ namespace ActorSpace
             this.InventorySize = 0;
             this.Inventory = new Container[0];
             this.Sprite = Methods.LoadSprite("Sprites/ActorSprites/Chicken");
+            this.MaxEnergy = 100;
+            this.Energy = this.MaxEnergy;
 
             if (Methods.CanMoveActor(this, TileOfActor))
             {
@@ -32,6 +35,11 @@ namespace ActorSpace
             else
             {
                 this.TileOfActor = null;
+            }
+
+            if (TileOfActor.RoomOfTile != null)
+            {
+                this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
             }
         }
 
