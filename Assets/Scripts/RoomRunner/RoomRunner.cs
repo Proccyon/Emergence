@@ -1,4 +1,4 @@
-﻿//-----Usage-----//
+﻿ //-----Usage-----//
 
 //-----UnityImports-----//
 using System.Collections;
@@ -74,7 +74,7 @@ public class RoomRunner : MonoBehaviour
         RoomList.Add(new Room(StructureLoader.OverworldStructure)); //Add a room based on the overworld structure. Will add more rooms later
         ActiveRoom = RoomList[0];//Set the room that is being drawn. Later on this will depend on the player.
 
-        List<GameObject> SpriteList = ActiveRoom.RenderRoom(); //Draws the room. Destroy all objects in this List before redrawing
+        SpriteList = ActiveRoom.RenderRoom(); //Draws the room. Destroy all objects in this List before redrawing
     }
 
 
@@ -95,8 +95,9 @@ public class RoomRunner : MonoBehaviour
     {
         int ActionCount = 0; //Used to prevent endless loop
         IsRunning = true; //Might read this in other scripts
+        Action NewAction;
 
-        for(RunCount = 0; RunCount < WrapperList.Count; RunCount++) //Goes through WrapperList
+        for (RunCount = 0; RunCount < WrapperList.Count; RunCount++) //Goes through WrapperList
         {
             ObjectWrapper Wrapper = WrapperList[RunCount]; //Convenience
 
@@ -110,6 +111,7 @@ public class RoomRunner : MonoBehaviour
 
             if(Wrapper.Actor != null)
             {
+                
                 //Removes wrapper from list if TileOfActor is not set consistently (this happens when actors die, WrapperList will be the only reference to the actor)
                 if(Wrapper.Actor.TileOfActor == null || Wrapper.Actor.TileOfActor.ActorOfTile != Wrapper.Actor)
                 {
@@ -120,6 +122,7 @@ public class RoomRunner : MonoBehaviour
 
                 ActionCount = 0; 
                 Wrapper.Actor.TurnNumber = RunCount;
+                Wrapper.Actor.Energy = Wrapper.Actor.MaxEnergy; //Resets energy to max
 
                 //Keep running .Behaviour untill energy runs out
                 while(Wrapper.Actor.Energy > 0)
@@ -131,7 +134,7 @@ public class RoomRunner : MonoBehaviour
                     }
 
                     //Runs .Behaviour to get the action the actor wants to perform
-                    Action NewAction = Wrapper.Actor.Behaviour();
+                    NewAction = Wrapper.Actor.Behaviour();
 
                     //Checks if Actor has enought energy and nothing is preventing the action. Actors should check this themselves, this just prevents bugs
                     if(NewAction.EnergyCost <= Wrapper.Actor.Energy && NewAction.CanActivate(Wrapper.Actor))
@@ -166,6 +169,13 @@ public class RoomRunner : MonoBehaviour
             }
         }
         IsRunning = false;
+
+        //Draws the room
+        foreach(GameObject Sprite in SpriteList)
+        {
+            Destroy(Sprite);
+        }
+        SpriteList = ActiveRoom.RenderRoom();
 
     }
 }

@@ -72,7 +72,7 @@ namespace BlockSpace
         }
 
         //Returns a block instance identical to this one, placed at given tile. Returns null if tile is occupied.
-        public Block Copy(Tile NewTile)
+        public virtual Block Copy(Tile NewTile)
         {
             //Create new block instance
             Block NewBlock = new Block(this.Name, this.Solid,this.IsActive, this.Sprite, NewTile);

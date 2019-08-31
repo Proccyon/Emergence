@@ -21,11 +21,11 @@ namespace ActionSpace
 
     class WalkAction : Action
     {
-
+        public static float StaticEnergyCost = 100f;
         public WalkAction(Tile NewTile)
         {
 
-            this.EnergyCost = 25;
+            this.EnergyCost = StaticEnergyCost;
             this.CanActivate = (Actor => CanMove(Actor, NewTile));
             this.Activate = (Actor => MoveActor(Actor, NewTile));
         }
@@ -58,5 +58,6 @@ namespace ActionSpace
         {
             Methods.MoveActor(Actor, NewTile);
         }
+
     }
 }

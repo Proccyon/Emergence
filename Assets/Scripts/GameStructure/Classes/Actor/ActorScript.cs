@@ -26,7 +26,7 @@ namespace ActorSpace
     //Energy: The current amount of energy. Each turn actors can perform actions untill this variable reaches 0.
     //TurnNumber: The order in which actors and active blocks use Behaviour. 0 is first, highest TurnNumber is last.
     //TileOfActor: The Tile the actor is standing on.
-    public class Actor
+    public abstract class Actor
     {
         public string Name;
         public Sprite Sprite;
@@ -57,18 +57,19 @@ namespace ActorSpace
             if (Methods.CanMoveActor(this, TileOfActor))
             {
                 Methods.MoveActor(this, TileOfActor);
+
+                //If given tile is in a room, add actor to list that runs behaviour each turn
+                if (TileOfActor.RoomOfTile != null)
+                {
+                    //AddRandom returns the position where the actor is placed
+                    this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
+                }
+
             }
             else
             {
                 this.TileOfActor = null;
             }   
-            
-            //If given tile is in a room, add actor to list that runs behaviour each turn
-            if(TileOfActor.RoomOfTile != null)
-            {
-                //AddRandom returns the position where the actor is placed
-                this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
-            }
 
         }
        
@@ -84,32 +85,13 @@ namespace ActorSpace
 
         }
 
+
         //Returns a new Actor instance identical to this one, placed on NewTile
-        public Actor Copy(Tile NewTile)
-        {
-            //Create New actor instance
-            Actor NewActor = new Actor(this.Name,this.Sprite, this.InventorySize,MaxEnergy, NewTile);
-
-            //Checks if NewTile can hold this actor, otherwise return null
-            if(!Methods.CanMoveActor(NewActor,NewTile))
-            {
-                return null;
-            }
-
-            //Copy all containers in the old inventory
-            for (int i = 0; i < this.InventorySize; i++)
-            {
-                NewActor.Inventory[i] = this.Inventory[i].Copy();
-            }
-            return NewActor;
-            
-        }
+        public abstract Actor Copy(Tile NewTile);
 
         //This method is ran each turn by all actors. Actors will have to overload it.
-        public virtual Action Behaviour()
-        {
-            return null;
-        }
+        public abstract Action Behaviour();
+
         
     }
 

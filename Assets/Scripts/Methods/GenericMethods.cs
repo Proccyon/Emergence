@@ -12,6 +12,7 @@ using ActorSpace;
 using BlockSpace;
 using ItemSpace;
 using RoomSpace;
+using WrapperSpace;
 using StructureSpace;
 
 namespace GenericMethods
@@ -44,14 +45,44 @@ namespace GenericMethods
             return (NewTile.ActorOfTile == null);
         }
 
+        //Same method as above but with x,y coordinates
+        public static bool CanMoveActor(Actor Actor,int x,int y)
+        {
+            //Checks if (x,y) is inside the room   
+            if(IsInsideRoom(Actor.TileOfActor.RoomOfTile,x,y))
+            {
+                //Uses above method
+                return CanMoveActor(Actor, Actor.TileOfActor.RoomOfTile.TileArray[x, y]);
+            }
+            return false;
+        }
+
         //If Possible moves an actor to a given tile.
         public static void MoveActor(Actor Actor, Tile NewTile)
         {
             if (CanMoveActor(Actor, NewTile))
             {
+
                 //Checks if Actor was previously on a tile
                 if (Actor.TileOfActor != null)
                 { 
+                    Actor.TileOfActor.ActorOfTile = null; //Removes actor from old tile
+                }
+                Actor.TileOfActor = NewTile; //changes tile propery of the actor
+                NewTile.ActorOfTile = Actor; //changes actor property of the new tile
+            }
+        }
+
+        //Same method as above but with x,y coordinates
+        public static void MoveActor(Actor Actor, int x, int y)
+        {
+
+            if(CanMoveActor(Actor,x,y))
+            {
+                Tile NewTile = Actor.TileOfActor.RoomOfTile.TileArray[x, y];
+
+                if (Actor.TileOfActor != null)
+                {
                     Actor.TileOfActor.ActorOfTile = null; //Removes actor from old tile
                 }
                 Actor.TileOfActor = NewTile; //changes tile propery of the actor
@@ -78,6 +109,19 @@ namespace GenericMethods
             //Return true if NewTile contains no block, Return false if NewTile does contain a block
             return (NewTile.BlockOfTile == null);
 
+        }
+
+        public static bool CanMoveBlock(Block Block, int x, int y,Room ThisRoom =null)
+        {
+            if(ThisRoom == null)
+            {
+                ThisRoom = Block.TileOfBlock.RoomOfTile;
+            }
+            if (IsInsideRoom(ThisRoom, x, y))
+            {
+                return CanMoveBlock(Block,ThisRoom.TileArray[x,y]);
+            }
+            return false;
         }
          
         public static void MoveBlock(Block Block, Tile NewTile)
@@ -158,14 +202,14 @@ namespace GenericMethods
         {
             //Creates a new empty array
             Tile[,] NewTileArray = new Tile[TileArray.GetLength(0), TileArray.GetLength(1)];
-
+            
             //Goes through all the old tiles
             foreach (Tile OldTile in TileArray)
             {
                 //Creates a copy of each tile
                 NewTileArray[OldTile.X, OldTile.Y] = OldTile.Copy(TargetRoom);
             }
-
+            
             return NewTileArray;
         }
 
@@ -235,7 +279,10 @@ namespace GenericMethods
                 //Finds tile the actor is standing on and move Actor to it
                 Methods.MoveActor(Actor, SceneStructure.TileArray[x, y]);
 
+
             }
+            //Destroys itself. A new GameObject will only be drawn if inside the camera (probably).
+            MonoBehaviour.Destroy(LoaderScript.gameObject);
 
         }
 
@@ -260,6 +307,26 @@ namespace GenericMethods
 
             }
 
+            //Destroys itself. A new GameObject will only be drawn if inside the camera (probably).
+            MonoBehaviour.Destroy(LoaderScript.gameObject);
+
+        }
+
+        //-----MathMethods-----//
+        //Mathemetical methods not implemented in unity
+
+        public static float Length(float x, float y)
+        {
+            return Mathf.Sqrt(x * x + y * y);
+        }
+
+        public static bool IsInsideRoom(Room Room,int x,int y)
+        {
+            if(Room == null)
+            {
+                return false;
+            }
+            return (x >= 0 && y >= 0 && x <= Room.Width - 1 && y <= Room.Height - 1);
         }
 
 

@@ -1,4 +1,4 @@
-﻿//Usage: Creates an instance of an Actor and places it in "SceneStructure" variable in the "StructureProperties" script in the "StructureControl" gameObject.
+﻿ //Usage: Creates an instance of an Actor and places it in "SceneStructure" variable in the "StructureProperties" script in the "StructureControl" gameObject.
 //This code should be attached to a Chicken prefab.
 
 //-----Unity imports-----//
