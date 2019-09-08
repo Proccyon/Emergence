@@ -16,7 +16,7 @@ public class ChickenLoader : MonoBehaviour
     void Awake()
     {
 
-        Methods.SentActorToArray(new Chicken(), this);
+        Methods.SentActorToArray(new Chicken(null,false), this);
 
     }
 

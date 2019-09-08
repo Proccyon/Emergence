@@ -51,9 +51,6 @@ namespace ActionSpace
 }
 
 
-
-
-
 namespace ActorSpace
 {
     //FlowerTile: The tile with the flower the chicken is chasing
@@ -65,7 +62,7 @@ namespace ActorSpace
         List<Tile> FlowerPath;
 
         //Basic constructor
-        public Chicken(Tile TileOfActor = null)
+        public Chicken(Tile TileOfActor = null,bool AddToList = true)
         {
             this.Name = "Chicken";
             this.InventorySize = 0;
@@ -77,18 +74,17 @@ namespace ActorSpace
             if (Methods.CanMoveActor(this, TileOfActor))
             {
                 Methods.MoveActor(this, TileOfActor);
-
-                if (TileOfActor.RoomOfTile != null)
-                {
-                    this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
-                }
             }
             else
             {
                 this.TileOfActor = null;
             }
 
-
+            if(AddToList)
+            {
+                this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
+            }
+            
         }
 
         //Returns a new Actor instance identical to this one, placed on NewTile
@@ -96,8 +92,6 @@ namespace ActorSpace
         {
             //Create New actor instance
             Actor NewActor = new Chicken();
-            //Adds Actor to list of all actors and active blocks because it is made without direct tile
-            this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(NewActor));
 
             //Checks if NewTile can hold this actor, otherwise return null
             if (Methods.CanMoveActor(NewActor, NewTile))
@@ -116,12 +110,10 @@ namespace ActorSpace
             }
             return NewActor;
 
-        }
-
+        }       
 
         public override Action Behaviour()
         {
-
             if (Energy < WalkAction.StaticEnergyCost && Energy < EatFlowerAction.StaticEnergyCost)
             {
                 return new PassAction(this);
@@ -132,44 +124,47 @@ namespace ActorSpace
                 FlowerPath = null;
                 return new EatFlowerAction(TileOfActor.BlockOfTile);
             }
-            //If no flower is found yet, search for a new flower
+
             if (FlowerPath == null)
             {
-
                 Tile FlowerTile = FindClosestFlower();
-
-                //If no flower in range, place a random step
-                if (FlowerTile == null)
+                if(FlowerTile == null)
                 {
                     return new WalkAction(FindRandomTile());
                 }
                 else
                 {
                     FlowerPath = BM.GetPathToTile(TileOfActor, FlowerTile, this);
-                    if (FlowerPath == null)
+                    if(FlowerPath == null)
                     {
-                        return new WalkAction(FindRandomTile());
+                        return new WalkAction(FindRandomTile()); 
                     }
+                    return Behaviour();
                 }
-            }
-
-            if (Methods.CanMoveActor(this, FlowerPath[1]))
-            {
-                FlowerPath.RemoveAt(0);
-                return new WalkAction(FlowerPath[0]);
             }
             else
             {
-                FlowerPath = BM.GetPathToTile(TileOfActor, FlowerPath.Last(), this);
-                if (FlowerPath == null)
+                if(FlowerPath.Count != 0 && FlowerPath.Last().BlockOfTile != null && FlowerPath.Last().BlockOfTile.Name =="Flower")
                 {
-                    return new WalkAction(FindRandomTile());
+                    if(Methods.CanMoveActor(this,FlowerPath[0]))
+                    {
+                        return new WalkAction(FlowerPath[0]);
+                    }
+                    else
+                    {
+                        FlowerPath = BM.GetPathToTile(TileOfActor, FlowerPath.Last(), this);
+                        return Behaviour();
+                    }
                 }
-                FlowerPath.RemoveAt(0);
-                return new WalkAction(FlowerPath[0]);
+                else
+                {
+                    FlowerPath = null;
+                    return this.Behaviour();
+                }
             }
-
         }
+
+
 
         //Finds the flower that is closest to chicken and within ViewRadius
         public Tile FindClosestFlower()
@@ -219,6 +214,10 @@ namespace ActorSpace
             {
                 for (int dy = -1; dy <= 1; dy++)
                 {
+                    if(dx == 0 && dy == 0)
+                    {
+                        continue;
+                    }
 
                     //Checks if actor can move to the tile at (X0+dx,Y0+dy)
                     if (Methods.CanMoveActor(this, TileOfActor.X + dx, TileOfActor.Y + dy))

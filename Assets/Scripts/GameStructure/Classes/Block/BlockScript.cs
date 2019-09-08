@@ -36,7 +36,7 @@ namespace BlockSpace
         public Tile TileOfBlock;
 
         //Main constructor
-        public Block(string Name, bool Solid, bool IsActive,Sprite Sprite, Tile TileOfBlock)
+        public Block(string Name, bool Solid, bool IsActive,Sprite Sprite, Tile TileOfBlock = null,bool AddToList = true)
         {
             this.Name = Name;
             this.Solid = Solid;
@@ -52,8 +52,8 @@ namespace BlockSpace
                 this.TileOfBlock = null;
             }
 
-            //Add instance to list
-            if(IsActive && TileOfBlock != null)
+            //Add instance to list of all actors and active blocks. AddToList is false when block is added to sctructure
+            if(IsActive && AddToList)
             {
                 this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
             }
@@ -75,15 +75,16 @@ namespace BlockSpace
         public virtual Block Copy(Tile NewTile)
         {
             //Create new block instance
-            Block NewBlock = new Block(this.Name, this.Solid,this.IsActive, this.Sprite, NewTile);
+            Block NewBlock = new Block(this.Name, this.Solid,this.IsActive, this.Sprite);
 
             //Returns null if NewTile is already filled
-            if(!Methods.CanMoveBlock(NewBlock,NewTile))
+            if(Methods.CanMoveBlock(NewBlock,NewTile))
             {
-                return null;
+                Methods.MoveBlock(NewBlock, NewTile);
+                return NewBlock;
             }
 
-            return NewBlock;
+            return null;
         }
 
         //If IsActive is true, this methods runs each turn

@@ -70,7 +70,7 @@ namespace BehaviourMethods
 
                                 if ((X0 + dx, Y0 + dy) == (EndTile.X, EndTile.Y))
                                 {
-
+                                    NewWalker.RemoveAt(0);
                                     return NewWalker;
                                 }
                                 NewWalkerList.Add(NewWalker);

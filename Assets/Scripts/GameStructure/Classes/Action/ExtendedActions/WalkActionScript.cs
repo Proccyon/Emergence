@@ -50,7 +50,7 @@ namespace ActionSpace
                 return false;
             }
             //Checks if NewTile is 1 tile away from the actor
-            return Mathf.Abs(NewTile.X - Actor.TileOfActor.X) <= 1.1f && Mathf.Abs(NewTile.X - Actor.TileOfActor.X) <= 1.1f;
+            return Mathf.Abs(NewTile.X - Actor.TileOfActor.X) <= 1.1f && Mathf.Abs(NewTile.Y - Actor.TileOfActor.Y) <= 1.1f;
 
         }
 

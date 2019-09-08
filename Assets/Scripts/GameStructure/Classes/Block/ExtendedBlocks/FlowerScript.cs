@@ -17,11 +17,11 @@ namespace BlockSpace
     public class Flower : Block
     {
 
-        float ReproduceChance = 0.1f;
+        float ReproduceChance = 0.2f;
         int ReproduceRange = 5;
         public static Block ExampleInstance = new Flower();
 
-        public Flower(Tile TileOfBlock = null)
+        public Flower(Tile TileOfBlock = null,bool AddToList=true)
         {
             this.Name = "Flower";
             this.Solid = false;
@@ -37,8 +37,8 @@ namespace BlockSpace
                 this.TileOfBlock = null;
             }
 
-            //Add instance to list
-            if (IsActive && TileOfBlock != null)
+            //Add instance to list of all actors and active blocks. AddToList is false when block is added to sctructure
+            if (IsActive && AddToList)
             {
 
                 this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
@@ -47,13 +47,13 @@ namespace BlockSpace
 
         public override Block Copy(Tile NewTile)
         {
-            
 
-            //Returns null if NewTile is already filled
-            if (Methods.CanMoveBlock(Flower.ExampleInstance, NewTile))
+            Block NewFlower = new Flower();
+            
+            if (Methods.CanMoveBlock(NewFlower, NewTile))
             {
-                
-             return new Flower(NewTile);
+                Methods.MoveBlock(NewFlower, NewTile);
+                return NewFlower;
             }
             return null;       
         }

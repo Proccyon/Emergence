@@ -16,7 +16,7 @@ public class FlowerLoader : MonoBehaviour
     void Awake()
     {
 
-        Methods.SentBlockToArray(new  Flower(), this);
+        Methods.SentBlockToArray(new  Flower(null,false), this);
 
     }
 

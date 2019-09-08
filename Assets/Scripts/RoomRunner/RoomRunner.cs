@@ -68,6 +68,7 @@ public class RoomRunner : MonoBehaviour
     public static int RunCount = 0; //When running a turn, this is the 'i' equivalent of the for loop. It's static so AddRandom can acces it.
     public static bool IsRunning = false; //Wheter or not DoTurn is running
     public static int ActionLimit = 100; //Max amount of actions allowed to perform per turn
+    public static int TurnCount = 0;
 
     void Start()
     {
@@ -93,6 +94,8 @@ public class RoomRunner : MonoBehaviour
     //Runs .Behaviour method for all actors and active blocks. These are stored in WrapperList
     public void DoTurn()
     {
+        TurnCount += 1;
+        MonoBehaviour.print("TurnCount: "+TurnCount.ToString());
         int ActionCount = 0; //Used to prevent endless loop
         IsRunning = true; //Might read this in other scripts
         Action NewAction;
@@ -106,7 +109,7 @@ public class RoomRunner : MonoBehaviour
             {
                 WrapperList.RemoveAt(RunCount);
                 RunCount -= 1;
-                break;
+                continue;
             }
 
             if(Wrapper.Actor != null)
@@ -117,7 +120,7 @@ public class RoomRunner : MonoBehaviour
                 {
                     WrapperList.RemoveAt(RunCount);
                     RunCount -= 1;
-                    break;
+                    continue;
                 }
 
                 ActionCount = 0; 
@@ -130,7 +133,8 @@ public class RoomRunner : MonoBehaviour
                     //Prevents endless loop, some actions might not cost energy
                     if(ActionCount >= ActionLimit)
                     {
-                        break;
+                        print("Action Count exceeded limit for "+Wrapper.Actor.Name);
+                        continue;
                     }
 
                     //Runs .Behaviour to get the action the actor wants to perform
@@ -147,7 +151,7 @@ public class RoomRunner : MonoBehaviour
                     {
                         //Sends a message so the bug can be found
                         print(Wrapper.Actor.Name +" instance returned action that could not be activated!");
-                        break;
+                        continue;
                     }
                     ActionCount += 1;
                 }
@@ -161,7 +165,7 @@ public class RoomRunner : MonoBehaviour
                 {
                     WrapperList.RemoveAt(RunCount);
                     RunCount -= 1;
-                    break;
+                    continue;
                 }
 
                 Wrapper.Block.TurnNumber = RunCount;
