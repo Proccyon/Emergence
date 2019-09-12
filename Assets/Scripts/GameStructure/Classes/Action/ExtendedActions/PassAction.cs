@@ -24,7 +24,6 @@ namespace ActionSpace
 
         public PassAction(Actor Actor)
         {
-            MonoBehaviour.print("Pass");
             this.EnergyCost = Actor.Energy;
             this.CanActivate = ReturnTrue;
             this.Activate = DoNothing;
