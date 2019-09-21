@@ -10,6 +10,7 @@ using TileSpace;
 using RoomSpace;
 using ActorSpace;
 using BlockSpace;
+using GenericMethods;
 
 public class WoodTile : Tile
 {
@@ -21,7 +22,7 @@ public class WoodTile : Tile
         this.ActorOfTile = ActorOfTile;
         this.BlockOfTile = BlockOfTile;
 
-        this.FloorOfTile = Floor.WoodFloor;
+        this.Sprite = Methods.LoadSprite("Scripts/GameStructure/Classes/Tile/ExtendedTiles/WoodTile/WoodFloor");
         this.Name = "WoodTile";
     }
 

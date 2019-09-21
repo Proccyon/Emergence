@@ -27,39 +27,31 @@ namespace TileSpace
 
     public class Tile
     {
+
+        public Sprite Sprite;
+        public string Name;
         public Room RoomOfTile;
         public int X;
         public int Y;
-        public Floor FloorOfTile;
         public Actor ActorOfTile;
         public Block BlockOfTile;
-        public string Name;
+
 
         //Main constructor when Tile is added to a room. 
-        public Tile(Room RoomOfTile, int X,int Y, Floor FloorOfTile, string Name = "", Actor ActorOfTile=null, Block BlockOfTile=null)
+        public Tile(Sprite Sprite = null, string Name = "",Room RoomOfTile = null, int X = 0,int Y = 0, Actor ActorOfTile=null, Block BlockOfTile=null)
         {
+
+            this.Sprite = Sprite;
+            this.Name = Name;
+
             this.RoomOfTile = RoomOfTile;
             this.X = X;
             this.Y = Y;
-            this.FloorOfTile = FloorOfTile;
             this.ActorOfTile = ActorOfTile;
             this.BlockOfTile = BlockOfTile;
-            this.Name = Name;
 
         }
 
-        //Empty constructor. This is not intended to be used.
-        public Tile()
-        {
-            this.RoomOfTile = null;
-            this.X = 0;
-            this.Y = 0;
-            this.FloorOfTile = Floor.WoodFloor;
-            this.ActorOfTile = null;
-            this.BlockOfTile = null;
-            this.Name = "";
-
-        }
 
         //Returns a new tile instance identical to this one. NewTile is placed in given NewRoom at NewX,NewY.
         public Tile Copy(Room NewRoom,int NewX=-1,int NewY=-1)
@@ -71,7 +63,7 @@ namespace TileSpace
                 NewY = this.Y;
             }
             //Create new tile
-            Tile NewTile = new Tile(NewRoom, NewX, NewY, this.FloorOfTile,this.Name);
+            Tile NewTile = new Tile(this.Sprite, this.Name,NewRoom, NewX, NewY);
 
             //Creates a copy of Actor and block and moves it to NewTile(if they exist)
             if(this.ActorOfTile != null)
@@ -87,32 +79,6 @@ namespace TileSpace
 
         }
     }
-
-
-    //Name: Name of the floor. Not important but might be usefull later.
-    //Sprite: The image of the floor. This is supposed to be a square png image of fixed size.
-    public class Floor
-    {
-
-        public readonly string Name;
-        public readonly Sprite Sprite;
-
-        //-----Floor instances-----//
-        public static Floor WoodFloor = new Floor("WoodenFloor", Methods.LoadSprite("Scripts/GameStructure/Classes/Tile/ExtendedTiles/WoodTile/WoodFloor"));
-        public static Floor RoadFloor = new Floor("Road", Methods.LoadSprite("Scripts/GameStructure/Classes/Tile/ExtendedTiles/RoadTile/RoadFloor"));
-        public static Floor GrassFloor = new Floor("Grass", Methods.LoadSprite("Scripts/GameStructure/Classes/Tile/ExtendedTiles/GrassTile/GrassFloor"));
-
-        //Main constructor
-        public Floor(string Name, Sprite Sprite)
-        {
-            this.Name = Name;
-            this.Sprite = Sprite;
-        }
-
-
-    }
-
-
 }
 
 

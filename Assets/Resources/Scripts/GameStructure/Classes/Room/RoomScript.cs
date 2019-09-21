@@ -106,7 +106,7 @@ namespace RoomSpace
 
             foreach (Tile Tile in this.TileArray)
             {
-                SpriteObjectList.Add(Methods.CreateSpriteObject(Tile.FloorOfTile.Sprite, Tile.X+0.5f, Tile.Y+0.5f,Tile.Name));
+                SpriteObjectList.Add(Methods.CreateSpriteObject(Tile.Sprite, Tile.X+0.5f, Tile.Y+0.5f,Tile.Name));
                 if(Tile.ActorOfTile != null)
                 {
                     SpriteObjectList.Add(Methods.CreateSpriteObject(Tile.ActorOfTile.Sprite, Tile.X + 0.5f, Tile.Y + 0.5f,Tile.ActorOfTile.Name,2));

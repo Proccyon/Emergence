@@ -10,6 +10,7 @@ using TileSpace;
 using RoomSpace;
 using ActorSpace;
 using BlockSpace;
+using GenericMethods;
 
 public class RoadTile : Tile
 {
@@ -21,7 +22,7 @@ public class RoadTile : Tile
         this.ActorOfTile = ActorOfTile;
         this.BlockOfTile = BlockOfTile;
 
-        this.FloorOfTile = Floor.RoadFloor;
+        this.Sprite = Methods.LoadSprite("Scripts/GameStructure/Classes/Tile/ExtendedTiles/RoadTile/RoadFloor");
         this.Name = "RoadTile";
     }
 
