@@ -21,7 +21,7 @@ namespace TileSpace
     //RoomOfTile: The room the tile is in (ex. above ground, inside a dungeon). Is null when Tile is part of a structure.
     //x: The x coordinate of the tile within the room. x=0 is left
     //y: The y coordinate of the tile within the room. y= 0 is the bottom (so x=0,y=0 is the bottom left corner of the room)
-    //FloorOfTile: The floor of the tile. Determines the appearance and properties of the tile itself. (Ex. a wooden floor, a road, water etc.)
+    //Sprite: The appearance of the tile. Should be square.
     //ActorOfTile: The Actor that is standing on the tile. No more than 1 actor can stand on a tile. Variable is Null if no actors are on the tile.
     //BlockOfTile: The Block standing on the tile (A table, Stone, etc.). No more than 1 block can stand on a tile. If the block is solid no actors can move to this tile (ActorOfTile should be None).
 

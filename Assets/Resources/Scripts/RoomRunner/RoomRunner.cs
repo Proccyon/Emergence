@@ -79,18 +79,6 @@ public class RoomRunner : MonoBehaviour
     }
 
 
-    void Update()
-    {
-
-        //foreach(GameObject Sprite in SpriteList)
-        //{
-        //    Destroy(Sprite);
-        //}
-        //List<GameObject> SpriteList = ActiveRoom.RenderRoom();
-    }
-
-
-
     //Runs .Behaviour method for all actors and active blocks. These are stored in WrapperList
     public void DoTurn()
     {
@@ -104,27 +92,25 @@ public class RoomRunner : MonoBehaviour
         {
             ObjectWrapper Wrapper = WrapperList[RunCount]; //Convenience
 
-            //Remove Wrapper from list if it contains no blocks or actors
-            if((Wrapper.Actor == null && Wrapper.Block == null)) 
+            //Remove Wrapper from list if it is empty or actor/block tiles are inconsistent.
+            if
+            (
+            (Wrapper.Actor == null && Wrapper.Block == null)
+            ||(Wrapper.Actor != null && (Wrapper.Actor.TileOfActor == null || Wrapper.Actor.TileOfActor.ActorOfTile != Wrapper.Actor))
+            ||(Wrapper.Block != null && (Wrapper.Block.TileOfBlock == null || Wrapper.Block.TileOfBlock.BlockOfTile != Wrapper.Block))
+            )
             {
                 WrapperList.RemoveAt(RunCount);
                 RunCount -= 1;
                 continue;
             }
 
+            //Checks if actor is set
             if(Wrapper.Actor != null)
             {
                 
-                //Removes wrapper from list if TileOfActor is not set consistently (this happens when actors die, WrapperList will be the only reference to the actor)
-                if(Wrapper.Actor.TileOfActor == null || Wrapper.Actor.TileOfActor.ActorOfTile != Wrapper.Actor)
-                {
-                    WrapperList.RemoveAt(RunCount);
-                    RunCount -= 1;
-                    continue;
-                }
-
                 ActionCount = 0; 
-                Wrapper.Actor.TurnNumber = RunCount;
+                Wrapper.Actor.TurnNumber = RunCount; // Sets turn order so actor can use this information
                 Wrapper.Actor.Energy = Wrapper.Actor.MaxEnergy; //Resets energy to max
 
                 //Keep running .Behaviour untill energy runs out
@@ -160,18 +146,11 @@ public class RoomRunner : MonoBehaviour
             //Blocks have no Action equivalent. .Behaviour does stuff itself
             if(Wrapper.Block != null)
             {
-                //Removes wrapper from list if TileOfBlock is not set consistently (this happens when blocks get destroyed, WrapperList will be the only reference to the block)
-                if (Wrapper.Block.TileOfBlock == null || Wrapper.Block.TileOfBlock.BlockOfTile != Wrapper.Block)
-                {
-                    WrapperList.RemoveAt(RunCount);
-                    RunCount -= 1;
-                    continue;
-                }
-
                 Wrapper.Block.TurnNumber = RunCount;
                 Wrapper.Block.Behaviour();
             }
         }
+
         IsRunning = false;
 
         //Draws the room
