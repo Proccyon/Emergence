@@ -1,6 +1,6 @@
 ﻿//-----Usage-----//
-//Defines the Tile class and Floor class. Each square on the map corresponds to a tile. A tile can contain characters, items or blocks (Sometimes not all, depending on the item, character and block). 
-//Each tile has a floor property that determines how the tile looks and other effects (ex. a swamp floor might slow characters).
+//Defines the Tile class. Each square on the map corresponds to a tile. A tile can contain actors, items or blocks (Sometimes not all, depending on the item, character and block). 
+
  
 
 
@@ -13,6 +13,7 @@ using UnityEngine;
 using RoomSpace;
 using ActorSpace;
 using BlockSpace;
+using WallSpace;
 using GenericMethods;
 
 namespace TileSpace
@@ -35,10 +36,10 @@ namespace TileSpace
         public int Y;
         public Actor ActorOfTile;
         public Block BlockOfTile;
-
+        public Dictionary<Vector2Int,Wall> WallDict;
 
         //Main constructor when Tile is added to a room. 
-        public Tile(Sprite Sprite = null, string Name = "",Room RoomOfTile = null, int X = 0,int Y = 0, Actor ActorOfTile=null, Block BlockOfTile=null)
+        public Tile(Sprite Sprite = null, string Name = "",Room RoomOfTile = null, int X = 0,int Y = 0, Actor ActorOfTile=null, Block BlockOfTile=null, Dictionary<Vector2Int, Wall> WallDict = null)
         {
 
             this.Sprite = Sprite;
@@ -49,6 +50,14 @@ namespace TileSpace
             this.Y = Y;
             this.ActorOfTile = ActorOfTile;
             this.BlockOfTile = BlockOfTile;
+            if(WallDict == null) //If no WallDict is given
+            {
+                this.WallDict = new Dictionary<Vector2Int, Wall>(Wall.EmptyWallDict); 
+            }
+            else
+            {
+                this.WallDict = WallDict;
+            }
 
         }
 

@@ -10,6 +10,7 @@ using UnityEngine;
 using TileSpace;
 using ActorSpace;
 using BlockSpace;
+using WallSpace;
 using ItemSpace;
 using RoomSpace;
 using WrapperSpace;
@@ -141,7 +142,6 @@ namespace GenericMethods
         }
 
 
-
         //Checks if an item can be moved to a given container.
         public static bool CanMoveItem(Item Item, Container NewContainer)
         {
@@ -163,7 +163,52 @@ namespace GenericMethods
             }
         }
 
-        
+        //Checks if a wall can be moved to the edge between NewFrontTile and NewBackTile
+        public static bool CanMoveWall(Wall Wall, Tile NewFrontTile, Tile NewBackTile)
+        {
+
+            //How NewFrontTile and NewBackTile are aligned(ex. FrontTile is right of BackTile --> Rotation = (1,0))
+            Vector2Int Rotation = Wall.GetRotation(NewFrontTile, NewBackTile);
+
+            if (Rotation == Vector2Int.zero) //Returns false if NewFrontTile and NewBackTile are not next to each other
+            {
+                return false;
+            }
+
+            //Checks if walls already exist at NewFrontTile and NewBackTile
+            return NewFrontTile.WallDict[Rotation * -1] == null && NewBackTile.WallDict[Rotation] == null;
+
+        }
+
+        //Moves a wall to the edge between NewFrontTile and NewBackTile
+        public static void MoveWall(Wall Wall, Tile NewFrontTile, Tile NewBackTile)
+        {
+            //Chekcs if wall can be moved at all
+            if (CanMoveWall(Wall,NewFrontTile,NewBackTile))
+            {
+                //The rotation of the wall after it is moved
+                Vector2Int NewRotation = Wall.GetRotation(NewFrontTile, NewBackTile);
+
+                //Reference the wall in the new tiles
+                NewFrontTile.WallDict[NewRotation * -1] = Wall;
+                NewBackTile.WallDict[NewRotation] = Wall;
+
+                //Remove the reference to the wall in the old tiles
+                if (Wall.FrontTile != null)
+                {
+                    Wall.FrontTile.WallDict[Wall.Rotation * -1] = null;
+                }
+                if (Wall.BackTile != null)
+                {
+                    Wall.BackTile.WallDict[Wall.Rotation] = null;
+                }
+
+                //Reference the new tiles in the wall
+                Wall.FrontTile = NewFrontTile;
+                Wall.BackTile = NewBackTile;
+                Wall.Rotation = NewRotation;
+            }
+        }
 
 
         //-----Sprite methods-----//

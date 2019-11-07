@@ -23,7 +23,7 @@ namespace BlockSpace
 
     //Name: Name of the block.
     //Solid: If solid is true actors cannot be on the same tile as this block. If solid is false actors can stand an move through this block.
-    //IsActive: Active blocks execute behaviour method simmilar to actors. Setting IsActive to false prevents this.
+    //IsActive: Active blocks execute behaviour method similar to actors. Setting IsActive to false prevents this.
     //Sprite: The appearance of the block. Sprite is always square and the same size but can have any shape(by using transparant pixels).
     //TileOfBlock: The tile the block is standing on. Most  blocks won't move.
     public class Block
