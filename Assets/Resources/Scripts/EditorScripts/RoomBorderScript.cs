@@ -15,6 +15,17 @@ using UnityEditor;
 public class RoomBorderScript : MonoBehaviour
 {
 
+    //Destroys object with given name if it exists
+    public void DestroyObjectByName(string ObjectName)
+    {
+        if(IsOnScene(ObjectName))
+        {
+            GameObject Object = GameObject.Find(ObjectName);
+            DestroyImmediate(Object);
+        }
+
+    }
+
     //Checks if an object with name "ObjectName" is in the scene
     //Can be done more elegant but works for now.
     public bool IsOnScene(string ObjectName)
@@ -78,19 +89,34 @@ public class RoomBorderScript : MonoBehaviour
     void Update()
     {
 
+        //Moves structure control to (0,0,0), otherwise loadstructure in GenericMethods doesn't work
+        gameObject.transform.position = new Vector3(0, 0, 0);
+
+
         //Doesn't execute while game is active.
         if (!EditorApplication.isPlaying)
         {
 
+
             int RoomHeight = gameObject.GetComponent<StructurePropertiesScript>().StructureHeight;
             int RoomWidth = gameObject.GetComponent<StructurePropertiesScript>().StructureWidth;
+            bool SpawnBorders = gameObject.GetComponent<StructurePropertiesScript>().SpawnBorders;
 
-            //Creates borders at the correct positions.
-            CreateBorder(-0.5, (double)RoomHeight / 2, 1, RoomHeight + 2, "LeftRoomBorder");
-            CreateBorder(RoomWidth + 0.5, (double)RoomHeight / 2, 1, RoomHeight + 2, "RightRoomBorder");
-            CreateBorder((double)RoomWidth / 2, RoomHeight + 0.5, RoomWidth + 2, 1, "TopRoomBorder");
-            CreateBorder((double)RoomWidth / 2, -0.5, RoomWidth + 2, 1, "BottomRoomBorder");
-
+            if (SpawnBorders)
+            {
+                //Creates borders at the correct positions.
+                CreateBorder(-0.5, (double)RoomHeight / 2, 1, RoomHeight + 2, "LeftRoomBorder");
+                CreateBorder(RoomWidth + 0.5, (double)RoomHeight / 2, 1, RoomHeight + 2, "RightRoomBorder");
+                CreateBorder((double)RoomWidth / 2, RoomHeight + 0.5, RoomWidth + 2, 1, "TopRoomBorder");
+                CreateBorder((double)RoomWidth / 2, -0.5, RoomWidth + 2, 1, "BottomRoomBorder");
+            }
+            else
+            {
+                DestroyObjectByName("LeftRoomBorder");
+                DestroyObjectByName("RightRoomBorder");
+                DestroyObjectByName("TopRoomBorder");
+                DestroyObjectByName("BottomRoomBorder");
+            }
         }
         else
         {

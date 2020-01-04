@@ -14,6 +14,7 @@ using ItemSpace;
 using WrapperSpace;
 using ActionSpace;
 using GenericMethods;
+using StructureSpace;
 
 namespace ActorSpace
 {
@@ -36,10 +37,10 @@ namespace ActorSpace
         public float Energy;
         public int TurnNumber;
         public Tile TileOfActor;
-        
-        
+
+
         //Initializes an actor with an empty inventory. It's safer to add items after initialization.
-        public Actor(string Name, Sprite Sprite, int InventorySize,float MaxEnergy = 100, Tile TileOfActor = null,bool AddToList = true)
+        public Actor(string Name, Sprite Sprite, int InventorySize, float MaxEnergy = 100, Tile TileOfActor = null, bool AddToList = true)
         {
             this.Name = Name;
             this.Sprite = Sprite;
@@ -64,13 +65,13 @@ namespace ActorSpace
             }
 
             //Add this instance to list of all actors and active blocks. AddToList is set to false when actor is added to structure
-            if(AddToList)
+            if (AddToList)
             {
                 this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
             }
-            
+
         }
-       
+
         public Actor()
         {
             this.Name = "";
@@ -87,7 +88,7 @@ namespace ActorSpace
         public virtual Actor Copy(Tile NewTile)
         {
             //Create New actor instance
-            Actor NewActor = new Actor(Name,Sprite,InventorySize,MaxEnergy);            
+            Actor NewActor = new Actor(Name, Sprite, InventorySize, MaxEnergy);
 
             //Checks if NewTile can hold this actor, otherwise return null
             if (Methods.CanMoveActor(NewActor, NewTile))
@@ -114,8 +115,33 @@ namespace ActorSpace
             return new PassAction(this);
         }
 
-        
+
     }
+    //Name: Name of the ActorSpawner. Can be used to identify the type of ActorSpawner.
+    //Sprite: Sprite if the ActorSpawner. Should be the same sprite as in the editor. Unlikely to be seen in game.
+    //TileSpawner: Like an actor on a tile, the ActorSpawner is placed on a TileSpawner.
+    public class ActorSpawner
+        {
+
+        public string Name;
+        public Sprite Sprite;
+        public TileSpawner TileSpawner;
+
+        public ActorSpawner(string Name, Sprite Sprite, TileSpawner TileSpawner)
+        {
+            this.Name = Name;
+            this.Sprite = Sprite;
+            this.TileSpawner = TileSpawner;
+
+        }
+
+        //This is used to spawn an actor when creating a new room based on a structure, or place a structure inside an existing room.
+        public virtual void SpawnActor(Tile Tile)
+        {
+        }
+
+        }
+
 
 
 }

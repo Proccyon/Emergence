@@ -17,6 +17,7 @@ using RoomSpace;
 using ItemSpace;
 using WrapperSpace;
 using GenericMethods;
+using StructureSpace;
 
 namespace BlockSpace
 {
@@ -30,22 +31,22 @@ namespace BlockSpace
     {
         public string Name;
         public bool Solid;
-        public bool IsActive; 
+        public bool IsActive;
         public Sprite Sprite;
         public int TurnNumber;
         public Tile TileOfBlock;
 
         //Main constructor
-        public Block(string Name, bool Solid, bool IsActive,Sprite Sprite, Tile TileOfBlock = null,bool AddToList = true)
+        public Block(string Name, bool Solid, bool IsActive, Sprite Sprite, Tile TileOfBlock = null, bool AddToList = true)
         {
             this.Name = Name;
             this.Solid = Solid;
             this.Sprite = Sprite;
             this.IsActive = IsActive;
 
-            if(Methods.CanMoveBlock(this,TileOfBlock))
+            if (Methods.CanMoveBlock(this, TileOfBlock))
             {
-                Methods.MoveBlock(this,TileOfBlock);
+                Methods.MoveBlock(this, TileOfBlock);
             }
             else
             {
@@ -53,7 +54,7 @@ namespace BlockSpace
             }
 
             //Add instance to list of all actors and active blocks. AddToList is false when block is added to sctructure
-            if(IsActive && AddToList)
+            if (IsActive && AddToList)
             {
                 this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
             }
@@ -75,10 +76,10 @@ namespace BlockSpace
         public virtual Block Copy(Tile NewTile)
         {
             //Create new block instance
-            Block NewBlock = new Block(this.Name, this.Solid,this.IsActive, this.Sprite);
+            Block NewBlock = new Block(this.Name, this.Solid, this.IsActive, this.Sprite);
 
             //Returns null if NewTile is already filled
-            if(Methods.CanMoveBlock(NewBlock,NewTile))
+            if (Methods.CanMoveBlock(NewBlock, NewTile))
             {
                 Methods.MoveBlock(NewBlock, NewTile);
                 return NewBlock;
@@ -95,6 +96,24 @@ namespace BlockSpace
 
     }
 
+
+    public class BlockSpawner
+    {
+        string Name;
+        Sprite Sprite;
+        TileSpawner TileSpawner;
+
+        public BlockSpawner(string Name, Sprite Sprite, TileSpawner TileSpawner)
+        {
+            this.Name = Name;
+            this.Sprite = Sprite;
+            this.TileSpawner = TileSpawner;
+        }
+    
+        public virtual void SpawnBlock(Tile Tile)
+        {}
+
+    }
 
 }
 

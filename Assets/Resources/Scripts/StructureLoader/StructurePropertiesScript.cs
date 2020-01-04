@@ -16,6 +16,7 @@ public class StructurePropertiesScript : MonoBehaviour
 
     public int StructureHeight; //The heigth of the structure. Is set in the editor.
     public int StructureWidth; //The heigth of the structure. Is set in the editor.
+    public bool SpawnBorders = true; //Wheter or not black borders are created to indicate the edge of the structure
     public Structure SceneStructure; //The structure instance.
     public List<GameObject> ObjectList;
 
@@ -25,4 +26,10 @@ public class StructurePropertiesScript : MonoBehaviour
         SceneStructure = new Structure(StructureHeight, StructureWidth);
     }
 
+}
+
+public class CreateSpawnerScript : MonoBehaviour
+{
+    public virtual void CreateSpawner(Structure Structure, int x, int y)
+    { }
 }

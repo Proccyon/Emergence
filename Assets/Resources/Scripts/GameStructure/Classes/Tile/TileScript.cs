@@ -15,6 +15,7 @@ using ActorSpace;
 using BlockSpace;
 using WallSpace;
 using GenericMethods;
+using StructureSpace;
 
 namespace TileSpace
 {
@@ -88,6 +89,30 @@ namespace TileSpace
 
         }
     }
+
+    //Add comments later
+    public class TileSpawner
+    {
+        public string Name;
+        public Structure Structure;
+        public int X;
+        public int Y;
+
+        public TileSpawner(string Name,Structure Structure, int X, int Y)
+        {
+            this.Name = Name;
+            this.Structure = Structure;
+            this.X = X;
+            this.Y = Y;
+        }
+
+        //Spawns a tile at the given position in a room.
+        public virtual void SpawnTile(Room Room, int TileX,int TileY)
+        {
+        }
+
+    }
+
 }
 
 

@@ -321,7 +321,7 @@ namespace GenericMethods
                 //Gets the SceneRoom instance from the RoomProperties script
                 Structure SceneStructure = StructureControl.GetComponent<StructurePropertiesScript>().SceneStructure;
 
-                //Finds tile the actor is standing on and move Actor to it
+                //Finds tile the actor is standing on and move Actor to it 
                 Methods.MoveActor(Actor, SceneStructure.TileArray[x, y]);
 
 
@@ -374,6 +374,53 @@ namespace GenericMethods
             return (x >= 0 && y >= 0 && x <= Room.Width - 1 && y <= Room.Height - 1);
         }
 
+
+        //-----StructureMethods-----//
+        //Methods related to structures. Might move this later if a better spot is found.
+
+        //A selection of blocks is saved as a prefab. This methods creates a structure based on that prefab.
+        //Only works during runtime.
+        public static Structure LoadStructure(string PrefabName)
+        {
+            //The RoomControl prefab, prefab that contains everything in the structure
+            var RoomControl = (GameObject)Resources.Load(PrefabName, typeof(GameObject));
+
+            //Gets structure  height and width set inside the prefab
+            int StructureHeight = RoomControl.GetComponent<StructurePropertiesScript>().StructureHeight;
+            int StructureWidth = RoomControl.GetComponent<StructurePropertiesScript>().StructureWidth;
+
+            //Create a new empty structure we will fill afterwards
+            Structure Structure = new Structure(StructureHeight, StructureWidth);
+
+            //All the scripts inside one SpawnerObject, see the for loop
+            Component[] Scripts;
+
+            //The position of the object inside the structure
+            int x;
+            int y;
+
+            //Goes through each child of RoomControl (Tiles, blocks, actors, etc.)
+            foreach (Transform SpawnerObject in RoomControl.transform)
+            {
+
+                x = (int)SpawnerObject.position.x;
+                y = (int)SpawnerObject.position.y;
+
+                //Gets all CreateSpawnerScripts inside SpawnerObject, defined in StructurePropertiesScript
+                //All CreateSpawnerScripts have a method CreateSpawner that adds a spawner to the sctructure
+                Scripts = SpawnerObject.GetComponents(typeof(CreateSpawnerScript));
+
+                //Loops through all the scripts to find the one we need.
+                foreach(CreateSpawnerScript Script in Scripts)
+                {
+                    Script.CreateSpawner(Structure, x, y);
+                    break;
+                }
+               
+            }
+            return Structure;
+
+        }
 
     }
 }
