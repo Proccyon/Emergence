@@ -42,51 +42,34 @@ namespace TileSpace
         //Main constructor when Tile is added to a room. 
         public Tile(Sprite Sprite = null, string Name = "",Room RoomOfTile = null, int X = 0,int Y = 0, Actor ActorOfTile=null, Block BlockOfTile=null, Dictionary<Vector2Int, Wall> WallDict = null)
         {
-
+            
             this.Sprite = Sprite;
             this.Name = Name;
 
             this.RoomOfTile = RoomOfTile;
             this.X = X;
             this.Y = Y;
-            this.ActorOfTile = ActorOfTile;
-            this.BlockOfTile = BlockOfTile;
-            if(WallDict == null) //If no WallDict is given
+            Methods.MoveActor(ActorOfTile, this);
+            Methods.MoveBlock(BlockOfTile, this);
+
+            if (RoomOfTile != null && Methods.IsInsideRoom(RoomOfTile, X, Y))
             {
-                this.WallDict = new Dictionary<Vector2Int, Wall>(Wall.EmptyWallDict); 
+
+                if (RoomOfTile.TileArray[X, Y] != null)
+                {
+                    RoomOfTile.TileArray[X, Y].RoomOfTile = null;
+                }
+                RoomOfTile.TileArray[X, Y] = this;
+            }
+
+            if (WallDict == null) //If no WallDict is given
+            {
+                this.WallDict = new Dictionary<Vector2Int, Wall>(Wall.EmptyWallDict);
             }
             else
             {
                 this.WallDict = WallDict;
             }
-
-        }
-
-
-        //Returns a new tile instance identical to this one. NewTile is placed in given NewRoom at NewX,NewY.
-        public Tile Copy(Room NewRoom,int NewX=-1,int NewY=-1)
-        {
-            //If x or y is not given set NewX,NewY to X,Y of old tile
-            if(NewX <= 0 || NewY <= 0)
-            {
-                NewX = this.X;
-                NewY = this.Y;
-            }
-            //Create new tile
-            Tile NewTile = new Tile(this.Sprite, this.Name,NewRoom, NewX, NewY);
-
-            //Creates a copy of Actor and block and moves it to NewTile(if they exist)
-            if(this.ActorOfTile != null)
-            {
-                Actor NewActor = this.ActorOfTile.Copy(NewTile);
-            }
-            if (this.BlockOfTile != null)
-            {
-                Block NewBlock = this.BlockOfTile.Copy(NewTile);
-            }
-
-            return NewTile;
-
         }
     }
 
@@ -97,22 +80,51 @@ namespace TileSpace
         public Structure Structure;
         public int X;
         public int Y;
+        public ActorSpawner ActorSpawner;
+        public BlockSpawner BlockSpawner;
 
-        public TileSpawner(string Name,Structure Structure, int X, int Y)
+        public TileSpawner(string Name = "",Structure Structure = null, int X = 0, int Y = 0)
         {
             this.Name = Name;
-            this.Structure = Structure;
-            this.X = X;
-            this.Y = Y;
+            PlaceSpawner(Structure, X, Y);
         }
 
         //Spawns a tile at the given position in a room.
-        public virtual void SpawnTile(Room Room, int TileX,int TileY)
+        public virtual Tile SpawnTile(Room Room, int TileX,int TileY)
         {
+            return null;
         }
 
-    }
+        public void PlaceSpawner(Structure Structure, int X, int Y)
+        {
+            this.X = X;
+            this.Y = Y;
+            this.Structure = Structure;
 
+            if (Structure != null)
+            {
+                if (Structure.TileSpawnerArray[X, Y] != null)
+                {
+                    if (Structure.TileSpawnerArray[X, Y].ActorSpawner != null)
+                    {
+                        this.ActorSpawner = Structure.TileSpawnerArray[X, Y].ActorSpawner;
+                        Structure.TileSpawnerArray[X, Y].ActorSpawner.TileSpawner = this;
+                        Structure.TileSpawnerArray[X, Y].ActorSpawner = null;
+                    }
+
+                    if (Structure.TileSpawnerArray[X, Y].BlockSpawner != null && (this.ActorSpawner == null || Structure.TileSpawnerArray[X, Y].BlockSpawner.Solid == false))
+                    {
+                        this.BlockSpawner = Structure.TileSpawnerArray[X, Y].BlockSpawner;
+                        Structure.TileSpawnerArray[X, Y].BlockSpawner.TileSpawner = this;
+                        Structure.TileSpawnerArray[X, Y].BlockSpawner = null;
+                    }
+                    Structure.TileSpawnerArray[X, Y].Structure = null;
+                }
+                
+                Structure.TileSpawnerArray[X, Y] = this;
+            }
+        }
+    }
 }
 
 

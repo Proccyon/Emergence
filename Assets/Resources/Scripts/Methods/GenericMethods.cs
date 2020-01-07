@@ -30,11 +30,12 @@ namespace GenericMethods
         //Checks if an actor can move to a given tile. Returns true if possible, returns false if not possible.
         public static bool CanMoveActor(Actor Actor, Tile NewTile)
         {
-            //Return false if NewTile is set to null
-            if (NewTile == null)
+            //Return false if NewTile or Actor is set to null
+            if (NewTile == null || Actor == null)
             {
                 return false;
             }
+
 
             //Return false if there is a solid block at the new tile.
             if (NewTile.BlockOfTile != null && NewTile.BlockOfTile.Solid)
@@ -95,8 +96,8 @@ namespace GenericMethods
         public static bool CanMoveBlock(Block Block,Tile NewTile)
         {
             
-            //Return false if given tile is null
-            if(NewTile == null)
+            //Return false if given tile or block is null
+            if(NewTile == null || Block == null)
             {
                 return false;
             }
@@ -239,124 +240,6 @@ namespace GenericMethods
             return SpriteObject;
         }
 
-        //-----OtherMethods-----//
-        //Methods that do not fit a category
-
-        //Make a copy of a tile array and set the room of all the tiles to TargetRoom
-        public static Tile[,] CopyTileArray(Tile[,] TileArray, Room TargetRoom)
-        {
-            //Creates a new empty array
-            Tile[,] NewTileArray = new Tile[TileArray.GetLength(0), TileArray.GetLength(1)];
-            
-            //Goes through all the old tiles
-            foreach (Tile OldTile in TileArray)
-            {
-                //Creates a copy of each tile
-                NewTileArray[OldTile.X, OldTile.Y] = OldTile.Copy(TargetRoom);
-            }
-            
-            return NewTileArray;
-        }
-
-
-
-        //-----LoaderMethods-----//
-
-        //Places a tile instance in the TileArray of the StructureControl in the scene. Used in GrassTileLoader etc.
-        public static void SentTileToArray(Tile Tile, Component LoaderScript)
-        {
-            //Gets the position of the tile in the scene
-            int x = (int)(LoaderScript.gameObject.transform.position.x - 0.5f);
-            int y = (int)(LoaderScript.gameObject.transform.position.y - 0.5f);
-
-            Tile.X = x;
-            Tile.Y = y;
-
-            //Finds the RoomControl GameObject by name
-            GameObject StructureControl = GameObject.Find("StructureControl");
-
-            if (StructureControl != null)
-            {
-                //Gets the SceneRoom instance from the RoomProperties script
-                Structure SceneStructure = StructureControl.GetComponent<StructurePropertiesScript>().SceneStructure;
-
-                //Finds the actor and block already present in the structure
-                Actor OldActor = SceneStructure.TileArray[x, y].ActorOfTile;
-                Block OldBlock = SceneStructure.TileArray[x, y].BlockOfTile;
-
-                if (OldActor != null )
-                {
-                    //If there was already an actor on the tile (due to wrong load order) move it to correct tile
-                    Methods.MoveActor(OldActor, Tile);
-                }
-
-                if(OldBlock != null)
-                {
-                    //If there was already a block on the tile (due to wrong load order) move it to correct tile
-                    Methods.MoveBlock(OldBlock, Tile);
-                }
-
-                //Add the Tile to the array of the Structure instance
-                SceneStructure.TileArray[x, y] = Tile;
-
-            }
-
-            //Destroys itself. A new GameObject will only be drawn if inside the camera (probably).
-            MonoBehaviour.Destroy(LoaderScript.gameObject);
-        }
-
-        //Places an actor instance on a tile in the TileArray of the StructureControl in the scene. Used in ChickenLoader etc.
-        public static void SentActorToArray(Actor Actor, Component LoaderScript)
-        {
-
-            //Gets the position of the tile in the scene
-            int x = (int)(LoaderScript.gameObject.transform.position.x - 0.5f);
-            int y = (int)(LoaderScript.gameObject.transform.position.y - 0.5f);
-
-            //Finds the RoomControl GameObject by name
-            GameObject StructureControl = GameObject.Find("StructureControl");
-
-            if (StructureControl != null)
-            {
-                //Gets the SceneRoom instance from the RoomProperties script
-                Structure SceneStructure = StructureControl.GetComponent<StructurePropertiesScript>().SceneStructure;
-
-                //Finds tile the actor is standing on and move Actor to it 
-                Methods.MoveActor(Actor, SceneStructure.TileArray[x, y]);
-
-
-            }
-            //Destroys itself. A new GameObject will only be drawn if inside the camera (probably).
-            MonoBehaviour.Destroy(LoaderScript.gameObject);
-
-        }
-
-        //Places an Block instance on a tile in the TileArray of the StructureControl in the scene. Used in FLowerLoader etc.
-        public static void SentBlockToArray(Block Block, Component LoaderScript)
-        {
-
-            //Gets the position of the tile in the scene
-            int x = (int)(LoaderScript.gameObject.transform.position.x - 0.5f);
-            int y = (int)(LoaderScript.gameObject.transform.position.y - 0.5f);
-
-            //Finds the RoomControl GameObject by name
-            GameObject StructureControl = GameObject.Find("StructureControl");
-
-            if (StructureControl != null)
-            {
-                //Gets the SceneRoom instance from the RoomProperties script
-                Structure SceneStructure = StructureControl.GetComponent<StructurePropertiesScript>().SceneStructure;
-
-                //Finds tile the actor is standing on and move Actor to it
-                Methods.MoveBlock(Block, SceneStructure.TileArray[x, y]);
-
-            }
-
-            //Destroys itself. A new GameObject will only be drawn if inside the camera (probably).
-            MonoBehaviour.Destroy(LoaderScript.gameObject);
-
-        }
-
         //-----MathMethods-----//
         //Mathemetical methods not implemented in unity
 
@@ -384,14 +267,13 @@ namespace GenericMethods
         {
             //The RoomControl prefab, prefab that contains everything in the structure
             var RoomControl = (GameObject)Resources.Load(PrefabName, typeof(GameObject));
-
+            
             //Gets structure  height and width set inside the prefab
             int StructureHeight = RoomControl.GetComponent<StructurePropertiesScript>().StructureHeight;
             int StructureWidth = RoomControl.GetComponent<StructurePropertiesScript>().StructureWidth;
-
+            
             //Create a new empty structure we will fill afterwards
             Structure Structure = new Structure(StructureHeight, StructureWidth);
-
             //All the scripts inside one SpawnerObject, see the for loop
             Component[] Scripts;
 
@@ -402,7 +284,6 @@ namespace GenericMethods
             //Goes through each child of RoomControl (Tiles, blocks, actors, etc.)
             foreach (Transform SpawnerObject in RoomControl.transform)
             {
-
                 x = (int)SpawnerObject.position.x;
                 y = (int)SpawnerObject.position.y;
 
@@ -419,7 +300,6 @@ namespace GenericMethods
                
             }
             return Structure;
-
         }
 
     }

@@ -7,11 +7,11 @@ using TileSpace;
 using GenericMethods;
 
 
-public class GrassTileSpawnerScript : CreateSpawnerScript
+public class RoadTileSpawnerScript : CreateSpawnerScript
 {
 
     public override void CreateSpawner(Structure Structure, int X, int Y)
     {
-        new GrassTileSpawner(Structure,X,Y);
+        new RoadTileSpawner(Structure, X, Y);
     }
 }

@@ -28,6 +28,7 @@ public class StructurePropertiesScript : MonoBehaviour
 
 }
 
+
 public class CreateSpawnerScript : MonoBehaviour
 {
     public virtual void CreateSpawner(Structure Structure, int x, int y)

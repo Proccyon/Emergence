@@ -22,15 +22,15 @@ namespace StructureSpace
     {
         public int Height;
         public int Width;
-        public Tile[,] TileArray; //Readonly arrays dont work. TileArray[0,0] = x is still posible. We need it to work this way.
+        public TileSpawner[,] TileSpawnerArray; //Readonly arrays dont work. TileArray[0,0] = x is still posible. We need it to work this way.
 
         //Constructor that fills the structure with empty grass tiles
-        public Structure(int Height, int Width)
+        public Structure(int Height = 0, int Width = 0)
         {
             this.Height = Height;
             this.Width = Width;
 
-            this.TileArray = new Tile[Width, Height];
+            this.TileSpawnerArray = new TileSpawner[Width, Height];
 
             //Goes through each index of the array and fills it with grass tiles
             for (int x = 0; x < Width; x++)
@@ -38,20 +38,11 @@ namespace StructureSpace
                 for (int y = 0; y < Height; y++)
                 {
                     //Adds grass tiles with no block or actor.
-                    this.TileArray[x, y] = new GrassTile(null, x, y);
+                    this.TileSpawnerArray[x, y] = new GrassTileSpawner(this, x, y);
                 }
 
             }
         }
-
-        //Empty constructor
-        public Structure()
-        {
-            this.Height = 0;
-            this.Width = 0;
-            this.TileArray = null;
-        }
-
 
 
     }

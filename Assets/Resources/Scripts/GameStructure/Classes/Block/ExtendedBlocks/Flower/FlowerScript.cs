@@ -21,42 +21,9 @@ namespace BlockSpace
         int ReproduceRange = 5;
         public static Block ExampleInstance = new Flower();
 
-        public Flower(Tile TileOfBlock = null,bool AddToList=true)
-        {
-            this.Name = "Flower";
-            this.Solid = false;
-            this.IsActive = true;
-            this.Sprite = Methods.LoadSprite("Scripts/GameStructure/Classes/Block/ExtendedBlocks/Flower/FlowersSprite");
-
-            if (Methods.CanMoveBlock(this, TileOfBlock))
-            {
-                Methods.MoveBlock(this, TileOfBlock);
-            }
-            else
-            {
-                this.TileOfBlock = null;
-            }
-
-            //Add instance to list of all actors and active blocks. AddToList is false when block is added to sctructure
-            if (IsActive && AddToList)
-            {
-
-                this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
-            }
-        }
-
-        public override Block Copy(Tile NewTile)
-        {
-
-            Block NewFlower = new Flower();
-            
-            if (Methods.CanMoveBlock(NewFlower, NewTile))
-            {
-                Methods.MoveBlock(NewFlower, NewTile);
-                return NewFlower;
-            }
-            return null;       
-        }
+        public Flower(Tile TileOfBlock = null) 
+            : base("Flower",false,true, Methods.LoadSprite("Scripts/GameStructure/Classes/Block/ExtendedBlocks/Flower/FlowersSprite"),TileOfBlock)
+        {}
 
         //Randomly places flowers in vicinity
         public override void Behaviour()
@@ -76,5 +43,17 @@ namespace BlockSpace
             }
         }
 
+    }
+
+    public class FlowerSpawner : BlockSpawner
+    {
+        public FlowerSpawner(TileSpawner TileSpawner) 
+            : base("FlowerSpawner", Methods.LoadSprite("Scripts/GameStructure/Classes/Block/ExtendedBlocks/Flower/FlowersSprite"),TileSpawner,false)
+        {}
+
+        public override void SpawnBlock(Tile Tile)
+        {
+            new Flower(Tile);
+        }
     }
 }

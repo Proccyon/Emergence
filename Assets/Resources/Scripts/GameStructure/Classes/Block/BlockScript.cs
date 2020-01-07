@@ -37,7 +37,7 @@ namespace BlockSpace
         public Tile TileOfBlock;
 
         //Main constructor
-        public Block(string Name, bool Solid, bool IsActive, Sprite Sprite, Tile TileOfBlock = null, bool AddToList = true)
+        public Block(string Name = "", bool Solid = true, bool IsActive = false, Sprite Sprite = null, Tile TileOfBlock = null)
         {
             this.Name = Name;
             this.Solid = Solid;
@@ -53,23 +53,11 @@ namespace BlockSpace
                 this.TileOfBlock = null;
             }
 
-            //Add instance to list of all actors and active blocks. AddToList is false when block is added to sctructure
-            if (IsActive && AddToList)
+            //Add instance to list of all actors and active blocks.
+            if (IsActive)
             {
                 this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
             }
-
-
-        }
-
-        //Empty Constructor
-        public Block()
-        {
-            this.Name = "";
-            this.Solid = false;
-            this.IsActive = false;
-            this.Sprite = null;
-            this.TileOfBlock = null;
         }
 
         //Returns a block instance identical to this one, placed at given tile. Returns null if tile is occupied.
@@ -93,23 +81,32 @@ namespace BlockSpace
         {
         }
 
-
     }
 
 
     public class BlockSpawner
     {
-        string Name;
-        Sprite Sprite;
-        TileSpawner TileSpawner;
+        public string Name;
+        public Sprite Sprite;
+        public TileSpawner TileSpawner;
+        public bool Solid;
 
-        public BlockSpawner(string Name, Sprite Sprite, TileSpawner TileSpawner)
+        public BlockSpawner(string Name= "", Sprite Sprite = null, TileSpawner TileSpawner = null,bool Solid = true)
         {
             this.Name = Name;
             this.Sprite = Sprite;
-            this.TileSpawner = TileSpawner;
+
+            if (TileSpawner != null && TileSpawner.BlockSpawner == null && (TileSpawner.ActorSpawner == null || Solid == false))
+            {
+                this.TileSpawner = TileSpawner;
+                TileSpawner.BlockSpawner = this;
+            }
+            else
+            {
+                TileSpawner = null;
+            }
         }
-    
+ 
         public virtual void SpawnBlock(Tile Tile)
         {}
 

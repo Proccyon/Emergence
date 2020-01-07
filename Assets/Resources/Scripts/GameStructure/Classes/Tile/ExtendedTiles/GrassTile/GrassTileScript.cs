@@ -10,20 +10,31 @@ using TileSpace;
 using RoomSpace;
 using ActorSpace;
 using BlockSpace;
+using WallSpace;
+using StructureSpace;
 using GenericMethods;
 
-public class GrassTile : Tile
-{
-    public GrassTile(Room RoomOfTile = null, int X = 0, int Y = 0, Actor ActorOfTile = null, Block BlockOfTile = null)
-    {
-        this.RoomOfTile = RoomOfTile;
-        this.X = X;
-        this.Y = Y;
-        this.ActorOfTile = ActorOfTile;
-        this.BlockOfTile = BlockOfTile;
 
-        this.Sprite = Methods.LoadSprite("Scripts/GameStructure/Classes/Tile/ExtendedTiles/GrassTile/GrassFloor");
-        this.Name = "GrassTile";
+namespace TileSpace
+{
+
+    public class GrassTile : Tile
+    {
+        public GrassTile(Room RoomOfTile, int X=0, int Y=0, Actor ActorOfTile =null, Block BlockOfTile=null, Dictionary<Vector2Int, Wall> WallDict=null) : base(Methods.LoadSprite("Scripts/GameStructure/Classes/Tile/ExtendedTiles/GrassTile/GrassFloor"),"GrassTile",RoomOfTile, X, Y, ActorOfTile, BlockOfTile, WallDict)
+        {}
     }
 
+    public class GrassTileSpawner : TileSpawner
+    {
+        public GrassTileSpawner(Structure Structure, int X, int Y)
+        {
+            this.Name = "GrassTileSpawner";
+            this.PlaceSpawner(Structure, X, Y);
+        }
+
+        public override Tile SpawnTile(Room Room, int TileX, int TileY)
+        {
+            return new GrassTile(Room, TileX, TileY);
+        }
+    }
 }

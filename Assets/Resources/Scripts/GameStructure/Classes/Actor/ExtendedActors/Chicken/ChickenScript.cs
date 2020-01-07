@@ -62,55 +62,9 @@ namespace ActorSpace
         List<Tile> FlowerPath;
 
         //Basic constructor
-        public Chicken(Tile TileOfActor = null,bool AddToList = true)
-        {
-            this.Name = "Chicken";
-            this.InventorySize = 0;
-            this.Inventory = new Container[0];
-            this.Sprite = Methods.LoadSprite("Scripts/GameStructure/Classes/Actor/ExtendedActors/Chicken/Chicken");
-            this.MaxEnergy = 100;
-            this.Energy = this.MaxEnergy;
-
-            if (Methods.CanMoveActor(this, TileOfActor))
-            {
-                Methods.MoveActor(this, TileOfActor);
-            }
-            else
-            {
-                this.TileOfActor = null;
-            }
-
-            if(AddToList)
-            {
-                this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
-            }
-            
-        }
-
-        //Returns a new Actor instance identical to this one, placed on NewTile
-        public override Actor Copy(Tile NewTile)
-        {
-            //Create New actor instance
-            Actor NewActor = new Chicken();
-
-            //Checks if NewTile can hold this actor, otherwise return null
-            if (Methods.CanMoveActor(NewActor, NewTile))
-            {
-                Methods.MoveActor(NewActor, NewTile);
-            }
-            else
-            {
-                return null;
-            }
-
-            //Copy all containers in the old inventory
-            for (int i = 0; i < this.InventorySize; i++)
-            {
-                NewActor.Inventory[i] = this.Inventory[i].Copy();
-            }
-            return NewActor;
-
-        }       
+        public Chicken(Tile TileOfActor = null) 
+            : base("Chicken", Methods.LoadSprite("Scripts/GameStructure/Classes/Actor/ExtendedActors/Chicken/Chicken"),0,100,TileOfActor)
+        {}
 
         public override Action Behaviour()
         {
@@ -236,6 +190,23 @@ namespace ActorSpace
             return ValidTiles[(int)Random.Range(0, ValidTiles.Count)];
         }
 
+    }
+
+
+    public class ChickenSpawner : ActorSpawner
+    {
+
+        public ChickenSpawner(TileSpawner TileSpawner)
+        {
+            this.Name = "ChickenSpawner";
+            this.Sprite = Methods.LoadSprite("Scripts/GameStructure/Classes/Actor/ExtendedActors/Chicken/Chicken");
+            this.PlaceSpawner(TileSpawner);
+        }
+
+        public override void SpawnActor(Tile Tile)
+        {
+            new Chicken(Tile);
+        }
     }
 
 }

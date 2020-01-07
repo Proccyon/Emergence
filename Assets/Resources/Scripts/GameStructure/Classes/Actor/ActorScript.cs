@@ -18,7 +18,6 @@ using StructureSpace;
 
 namespace ActorSpace
 {
-
     //Name: Name of the Actor.
     //Sprite: The image belonging to the actor
     //Inventory: An array of containers. Each container holds a single item.
@@ -40,7 +39,7 @@ namespace ActorSpace
 
 
         //Initializes an actor with an empty inventory. It's safer to add items after initialization.
-        public Actor(string Name, Sprite Sprite, int InventorySize, float MaxEnergy = 100, Tile TileOfActor = null, bool AddToList = true)
+        public Actor(string Name="", Sprite Sprite=null, int InventorySize=0, float MaxEnergy = 100, Tile TileOfActor = null)
         {
             this.Name = Name;
             this.Sprite = Sprite;
@@ -48,6 +47,7 @@ namespace ActorSpace
             this.MaxEnergy = MaxEnergy;
             this.Energy = MaxEnergy;
             this.Inventory = new Container[InventorySize];
+            
             //Fils inventory with empty containers
             for (int i = 0; i < InventorySize; i++)
             {
@@ -64,48 +64,9 @@ namespace ActorSpace
                 this.TileOfActor = null;
             }
 
-            //Add this instance to list of all actors and active blocks. AddToList is set to false when actor is added to structure
-            if (AddToList)
-            {
-                this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
-            }
-
-        }
-
-        public Actor()
-        {
-            this.Name = "";
-            this.Sprite = null;
-            this.InventorySize = 0;
-            this.MaxEnergy = 0f;
-            this.Energy = 0f;
-            this.TileOfActor = null;
-            this.Inventory = new Container[0];
-
-        }
-
-        //Returns a new Actor instance identical to this one, placed on NewTile
-        public virtual Actor Copy(Tile NewTile)
-        {
-            //Create New actor instance
-            Actor NewActor = new Actor(Name, Sprite, InventorySize, MaxEnergy);
-
-            //Checks if NewTile can hold this actor, otherwise return null
-            if (Methods.CanMoveActor(NewActor, NewTile))
-            {
-                Methods.MoveActor(NewActor, NewTile);
-            }
-            else
-            {
-                return null;
-            }
-
-            //Copy all containers in the old inventory
-            for (int i = 0; i < this.InventorySize; i++)
-            {
-                NewActor.Inventory[i] = this.Inventory[i].Copy();
-            }
-            return NewActor;
+            //Add actor to list of all actors
+            this.TurnNumber = RoomRunner.WrapperList.AddRandom(new ObjectWrapper(this));
+            
 
         }
 
@@ -127,12 +88,26 @@ namespace ActorSpace
         public Sprite Sprite;
         public TileSpawner TileSpawner;
 
-        public ActorSpawner(string Name, Sprite Sprite, TileSpawner TileSpawner)
+        public ActorSpawner(string Name = "", Sprite Sprite = null, TileSpawner TileSpawner = null)
         {
             this.Name = Name;
             this.Sprite = Sprite;
-            this.TileSpawner = TileSpawner;
+            this.PlaceSpawner(TileSpawner);
 
+        }
+
+        public void PlaceSpawner(TileSpawner TileSpawner)
+        {
+
+            if(TileSpawner != null && TileSpawner.ActorSpawner == null && (TileSpawner.BlockSpawner == null || TileSpawner.BlockSpawner.Solid == false))
+            {
+                this.TileSpawner = TileSpawner;
+                TileSpawner.ActorSpawner = this;
+            }
+            else
+            {
+                this.TileSpawner = null;
+            }
         }
 
         //This is used to spawn an actor when creating a new room based on a structure, or place a structure inside an existing room.

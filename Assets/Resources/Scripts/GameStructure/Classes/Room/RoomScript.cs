@@ -28,16 +28,30 @@ namespace RoomSpace
         public Tile[,] TileArray;
 
         //Main constructor, Makes a room based on a (readonly) structure instance
-        public Room (Structure Structure)
+        public Room(Structure Structure)
         {
             this.Height = Structure.Height;
             this.Width = Structure.Width;
-            this.TileArray = Methods.CopyTileArray(Structure.TileArray, this);
+            this.TileArray = new Tile[Width, Height];
+
+            for (int x = 0; x < Structure.Width; x++)
+            {
+                for (int y = 0; y < Structure.Height; y++)
+                {
+                    Tile NewTile = Structure.TileSpawnerArray[x, y].SpawnTile(this, x, y);
+                    if (Structure.TileSpawnerArray[x, y].ActorSpawner != null)
+                    {
+                        Structure.TileSpawnerArray[x, y].ActorSpawner.SpawnActor(NewTile);
+                    }
+                    if(Structure.TileSpawnerArray[x, y].BlockSpawner != null)
+                    {
+                        Structure.TileSpawnerArray[x, y].BlockSpawner.SpawnBlock(NewTile);
+                    }
+                }
+            }
         }
-
-
         //Creates an empty room of size (Width,Height) and fills it with grass tiles
-        public Room(int Height, int Width)
+        public Room(int Height=0, int Width=0)
         {
             this.Height = Height;
             this.Width = Width;
@@ -55,33 +69,7 @@ namespace RoomSpace
 
             }
 
-        }
-
-        //Constructor that sets everything to null
-        public Room()
-        {
-            this.Height = 0;
-            this.Width = 0;
-            this.TileArray = null;
-        }
-
-        
-
-        //Returns a new room instance that is identical to this one.
-        public Room Copy()
-        {
-            //Creates a new empty room
-
-            Room NewRoom = new Room();
-
-            //Sets the variables of the new room
-            NewRoom.Height = this.Height;
-            NewRoom.Width = this.Width;
-            NewRoom.TileArray = Methods.CopyTileArray(this.TileArray, NewRoom);
-
-            return NewRoom;
-
-        }
+        }      
 
         //Returns a list of all actors in the room
         public List<Actor> GetActorList()

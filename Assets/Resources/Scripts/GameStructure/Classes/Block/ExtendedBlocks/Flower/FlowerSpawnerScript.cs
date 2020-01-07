@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using StructureSpace;
+using BlockSpace;
 using TileSpace;
-using GenericMethods;
+using StructureSpace;
 
 
-public class GrassTileSpawnerScript : CreateSpawnerScript
+public class FlowerSpawnerScript : CreateSpawnerScript
 {
 
     public override void CreateSpawner(Structure Structure, int X, int Y)
     {
-        new GrassTileSpawner(Structure,X,Y);
+        new FlowerSpawner(Structure.TileSpawnerArray[X, Y]);
     }
 }

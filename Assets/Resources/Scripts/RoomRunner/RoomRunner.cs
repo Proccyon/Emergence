@@ -11,8 +11,9 @@ using ActorSpace;
 using TileSpace;
 using BlockSpace;
 using ActionSpace;
+using StructureSpace;
 using WrapperSpace;
-
+using GenericMethods;
 
 namespace WrapperSpace
 {
@@ -70,11 +71,15 @@ public class RoomRunner : MonoBehaviour
     public static int ActionLimit = 100; //Max amount of actions allowed to perform per turn
     public static int TurnCount = 0;
 
-    void Start()
-    {
-        RoomList.Add(new Room(StructureLoader.OverworldStructure)); //Add a room based on the overworld structure. Will add more rooms later
-        ActiveRoom = RoomList[0];//Set the room that is being drawn. Later on this will depend on the player.
+    public Structure OverworldStructure;
 
+    void Awake()
+    {
+        OverworldStructure = Methods.LoadStructure("StructurePrefabs/OverworldPrefab");
+
+        RoomList.Add(new Room(OverworldStructure)); //Add a room based on the overworld structure. Will add more rooms later
+        ActiveRoom = RoomList[0];//Set the room that is being drawn. Later on this will depend on the player.
+        
         SpriteList = ActiveRoom.RenderRoom(); //Draws the room. Destroy all objects in this List before redrawing
     }
 
@@ -82,6 +87,7 @@ public class RoomRunner : MonoBehaviour
     //Runs .Behaviour method for all actors and active blocks. These are stored in WrapperList
     public void DoTurn()
     {
+        MonoBehaviour.print("Turn Done");
         TurnCount += 1;
         MonoBehaviour.print("TurnCount: "+TurnCount.ToString());
         int ActionCount = 0; //Used to prevent endless loop
