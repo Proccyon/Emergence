@@ -20,22 +20,20 @@ namespace TileSpace
 
     public class RoadTile : Tile
     {
-        public RoadTile(Room RoomOfTile, int X = 0, int Y = 0, Actor ActorOfTile = null, Block BlockOfTile = null, Dictionary<Vector2Int, Wall> WallDict = null) 
-            : base(Methods.LoadSprite("Scripts/Classes/Tile/ExtendedTiles/RoadTile/RoadFloor"), "RoadTile",RoomOfTile,X,Y,ActorOfTile,BlockOfTile,WallDict)
+        public RoadTile(Room RoomOfTile, int X = 0, int Y = 0, Dictionary<Vector2Int, Wall> WallDict = null, Actor ActorOfTile = null, Block BlockOfTile = null ) 
+            : base(Methods.LoadSprite("Scripts/Classes/Tile/ExtendedTiles/RoadTile/RoadFloor"), "RoadTile",RoomOfTile,X,Y, WallDict,ActorOfTile, BlockOfTile)
         {}
     }
 
     public class RoadTileSpawner : TileSpawner
     {
-        public RoadTileSpawner(Structure Structure, int X, int Y)
-        {
-            this.Name = "RoadTileSpawner";
-            this.PlaceSpawner(Structure, X, Y);
-        }
+        public RoadTileSpawner(Structure Structure, int X, int Y) 
+            : base("RoadTileSpawner",Structure,X,Y)
+        {}
 
-        public override Tile SpawnTile(Room Room, int TileX, int TileY)
+        public override Tile SpawnTile(Room Room, int TileX, int TileY, Dictionary<Vector2Int, Wall> NewWallDict = null)
         {            
-            return new RoadTile(Room, TileX, TileY);
+            return new RoadTile(Room, TileX, TileY,NewWallDict);
         }
     }
 }

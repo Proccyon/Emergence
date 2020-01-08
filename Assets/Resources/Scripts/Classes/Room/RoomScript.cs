@@ -14,6 +14,7 @@ using TileSpace;
 using GenericMethods;
 using StructureSpace;
 using ActorSpace;
+using WallSpace;
 
 namespace RoomSpace
 {
@@ -27,26 +28,61 @@ namespace RoomSpace
         public int Width;
         public Tile[,] TileArray;
 
-        //Main constructor, Makes a room based on a (readonly) structure instance
+        //Main constructor, Makes a room based on a structure instance
         public Room(Structure Structure)
         {
             this.Height = Structure.Height;
             this.Width = Structure.Width;
             this.TileArray = new Tile[Width, Height];
 
+            for (int x = 0; x < Width; x++)
+            {
+                for (int y = 0; y < Height; y++)
+                {
+                    //Adds grass tiles with no block or actor.
+                    TileArray[x, y] = new GrassTile(this, x, y);
+                }
+
+            }
+
             for (int x = 0; x < Structure.Width; x++)
             {
                 for (int y = 0; y < Structure.Height; y++)
                 {
-                    Tile NewTile = Structure.TileSpawnerArray[x, y].SpawnTile(this, x, y);
-                    if (Structure.TileSpawnerArray[x, y].ActorSpawner != null)
+                    TileSpawner TileSpawner = Structure.TileSpawnerArray[x, y];
+                    Tile NewTile = TileSpawner.SpawnTile(this, x, y,this.TileArray[x,y].WallDict);
+                    
+                    if (TileSpawner.ActorSpawner != null)
                     {
-                        Structure.TileSpawnerArray[x, y].ActorSpawner.SpawnActor(NewTile);
+                        TileSpawner.ActorSpawner.SpawnActor(NewTile);
                     }
-                    if(Structure.TileSpawnerArray[x, y].BlockSpawner != null)
+                    if(TileSpawner.BlockSpawner != null)
                     {
-                        Structure.TileSpawnerArray[x, y].BlockSpawner.SpawnBlock(NewTile);
+                        TileSpawner.BlockSpawner.SpawnBlock(NewTile);
                     }
+
+                    //This method excludes walls on the west/south side of the border, there shouldn't be walls there anyway
+                    WallSpawner TopWallSpawner = TileSpawner.WallSpawnerDict[Vector2Int.up];
+                    WallSpawner RightWallSpawner = TileSpawner.WallSpawnerDict[Vector2Int.right];
+
+                    if(TopWallSpawner != null && TopWallSpawner.Rotation == Vector2Int.up)
+                    {
+                        TopWallSpawner.SpawnWall(this.TileArray[x, y + 1], this.TileArray[x, y]);
+                    }
+                    if(TopWallSpawner != null && TopWallSpawner.Rotation == Vector2Int.down)
+                    {
+                        TopWallSpawner.SpawnWall(this.TileArray[x, y], this.TileArray[x, y+1]);
+                    }
+                    if (RightWallSpawner != null && RightWallSpawner.Rotation == Vector2Int.right)
+                    {
+                        RightWallSpawner.SpawnWall(this.TileArray[x+1, y], this.TileArray[x, y]);
+                    }
+                    if (RightWallSpawner != null && RightWallSpawner.Rotation == Vector2Int.left)
+                    {
+                        RightWallSpawner.SpawnWall(this.TileArray[x, y], this.TileArray[x+1, y]);
+                    }
+
+
                 }
             }
         }
@@ -94,18 +130,44 @@ namespace RoomSpace
 
             foreach (Tile Tile in this.TileArray)
             {
+                //Draws the Tile
                 SpriteObjectList.Add(Methods.CreateSpriteObject(Tile.Sprite, Tile.X+0.5f, Tile.Y+0.5f,Tile.Name));
                 if(Tile.ActorOfTile != null)
                 {
+                    //Draws the actor if there is one
                     SpriteObjectList.Add(Methods.CreateSpriteObject(Tile.ActorOfTile.Sprite, Tile.X + 0.5f, Tile.Y + 0.5f,Tile.ActorOfTile.Name,2));
                 }
                 if (Tile.BlockOfTile != null)
                 {
+                    //Draws the block if there is one
                     SpriteObjectList.Add(Methods.CreateSpriteObject(Tile.BlockOfTile.Sprite, Tile.X + 0.5f, Tile.Y + 0.5f, Tile.BlockOfTile.Name, 1));
                 }
 
+                Wall RightWall = Tile.WallDict[Vector2Int.right];
+                Wall UpWall = Tile.WallDict[Vector2Int.up];               
+                Wall LeftWall = Tile.WallDict[Vector2Int.left];
+                Wall DownWall = Tile.WallDict[Vector2Int.down];
+
+
+                if (RightWall != null)
+                {
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(RightWall.WallSprite, Tile.X + 1f, Tile.Y + 0.5f, RightWall.Name, 3, RightWall.GetAngle()));
+                }
+                if (UpWall != null)
+                {
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(UpWall.WallSprite, Tile.X + 0.5f, Tile.Y + 1f, UpWall.Name, 3, UpWall.GetAngle()));
+                }
+                if (LeftWall != null)
+                {
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(LeftWall.WallSprite, Tile.X, Tile.Y + 0.5f, LeftWall.Name, 3, LeftWall.GetAngle()));
+                }
+                if (DownWall != null)
+                {
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(DownWall.WallSprite, Tile.X + 0.5f, Tile.Y, DownWall.Name, 3, DownWall.GetAngle()));
+                }
+
             }
-            return SpriteObjectList;
+            return SpriteObjectList; //This is returned so that all sprites can be destroyed on the next turn
 
         }
 

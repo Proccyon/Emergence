@@ -168,7 +168,7 @@ namespace GenericMethods
         public static bool CanMoveWall(Wall Wall, Tile NewFrontTile, Tile NewBackTile)
         {
 
-            //How NewFrontTile and NewBackTile are aligned(ex. FrontTile is right of BackTile --> Rotation = (1,0))
+            //How NewFrontTile and NewBackTile are aligned(ex. FrontTile is east of BackTile --> Rotation = (1,0))
             Vector2Int Rotation = Wall.GetRotation(NewFrontTile, NewBackTile);
 
             if (Rotation == Vector2Int.zero) //Returns false if NewFrontTile and NewBackTile are not next to each other
@@ -226,26 +226,34 @@ namespace GenericMethods
         }
 
         //Creates a gameObject with the Sprite Sprite at position x,y
-        public static GameObject CreateSpriteObject(Sprite Sprite,float x,float y,string Name = "SpriteObject",int SortingOrder = 0)
+        public static GameObject CreateSpriteObject(Sprite Sprite,float x,float y,string Name = "SpriteObject",int SortingOrder = 0,float Angle=0)
         {
             
             GameObject SpriteObject = new GameObject(Name);
             SpriteObject.transform.position = new Vector3(x, y, 0);//Set position
+            SpriteObject.transform.eulerAngles = new Vector3(0, 0, Angle);
             SpriteRenderer Renderer = SpriteObject.AddComponent<SpriteRenderer>(); //Add Sprite renderer
             Renderer.sprite = Sprite; //Set sprite
             Renderer.sortingOrder = SortingOrder; //Sorting order is the height of the draw layer
 
             //Adjust the scale so sprite is 100 by 100
-            SpriteObject.transform.localScale *= 100 / Sprite.rect.width;
+            SpriteObject.transform.localScale *= 100 / Sprite.rect.height;
             return SpriteObject;
         }
 
         //-----MathMethods-----//
         //Mathemetical methods not implemented in unity
 
+        //Length of 2-dimensional vector (x,y)
         public static float Length(float x, float y)
         {
             return Mathf.Sqrt(x * x + y * y);
+        }
+
+        //Length of 2-dimensional vector (x1,y1) - (x2,y2)
+        public static float Distance(float x1, float y1, float x2, float y2)
+        {
+            return Length(x1 - x2, y1 - y2);
         }
 
         public static bool IsInsideRoom(Room Room,int x,int y)
@@ -284,8 +292,8 @@ namespace GenericMethods
             //Goes through each child of RoomControl (Tiles, blocks, actors, etc.)
             foreach (Transform SpawnerObject in RoomControl.transform)
             {
-                x = (int)SpawnerObject.position.x;
-                y = (int)SpawnerObject.position.y;
+                x = (int)Mathf.Round(SpawnerObject.position.x-0.5f);
+                y = (int)Mathf.Round(SpawnerObject.position.y-0.5f);
 
                 //Gets all CreateSpawnerScripts inside SpawnerObject, defined in StructurePropertiesScript
                 //All CreateSpawnerScripts have a method CreateSpawner that adds a spawner to the sctructure

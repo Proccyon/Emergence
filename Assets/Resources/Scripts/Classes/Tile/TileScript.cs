@@ -40,7 +40,7 @@ namespace TileSpace
         public Dictionary<Vector2Int,Wall> WallDict;
 
         //Main constructor when Tile is added to a room. 
-        public Tile(Sprite Sprite = null, string Name = "",Room RoomOfTile = null, int X = 0,int Y = 0, Actor ActorOfTile=null, Block BlockOfTile=null, Dictionary<Vector2Int, Wall> WallDict = null)
+        public Tile(Sprite Sprite = null, string Name = "",Room RoomOfTile = null, int X = 0,int Y = 0, Dictionary<Vector2Int, Wall> WallDict = null, Actor ActorOfTile=null, Block BlockOfTile=null )
         {
             
             this.Sprite = Sprite;
@@ -82,24 +82,23 @@ namespace TileSpace
         public int Y;
         public ActorSpawner ActorSpawner;
         public BlockSpawner BlockSpawner;
+        public Dictionary<Vector2Int, WallSpawner> WallSpawnerDict;
 
-        public TileSpawner(string Name = "",Structure Structure = null, int X = 0, int Y = 0)
+        public TileSpawner(string Name = "",Structure Structure = null, int X = 0, int Y = 0, Dictionary<Vector2Int, WallSpawner> WallSpawnerDict = null)
         {
             this.Name = Name;
-            PlaceSpawner(Structure, X, Y);
-        }
-
-        //Spawns a tile at the given position in a room.
-        public virtual Tile SpawnTile(Room Room, int TileX,int TileY)
-        {
-            return null;
-        }
-
-        public void PlaceSpawner(Structure Structure, int X, int Y)
-        {
             this.X = X;
             this.Y = Y;
             this.Structure = Structure;
+
+            if(WallSpawnerDict == null)
+            {
+                this.WallSpawnerDict = new Dictionary<Vector2Int, WallSpawner>(WallSpawner.EmptyWallSpawnerDict);
+            }
+            else
+            {
+                this.WallSpawnerDict = WallSpawnerDict;
+            }
 
             if (Structure != null)
             {
@@ -120,9 +119,15 @@ namespace TileSpace
                     }
                     Structure.TileSpawnerArray[X, Y].Structure = null;
                 }
-                
+
                 Structure.TileSpawnerArray[X, Y] = this;
             }
+        }
+
+        //Spawns a tile at the given position in a room.
+        public virtual Tile SpawnTile(Room Room, int TileX,int TileY, Dictionary<Vector2Int, Wall> WallDict = null)
+        {
+            return null;
         }
     }
 }
