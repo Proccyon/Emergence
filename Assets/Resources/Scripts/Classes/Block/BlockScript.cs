@@ -37,7 +37,7 @@ namespace BlockSpace
         public Tile TileOfBlock;
 
         //Main constructor
-        public Block(string Name = "", bool Solid = true, bool IsActive = false, Sprite Sprite = null, Tile TileOfBlock = null)
+        public Block(Tile TileOfBlock,string Name = "", Sprite Sprite = null,bool Solid = true, bool IsActive = false)
         {
             this.Name = Name;
             this.Solid = Solid;
@@ -60,27 +60,11 @@ namespace BlockSpace
             }
         }
 
-        //Returns a block instance identical to this one, placed at given tile. Returns null if tile is occupied.
-        public virtual Block Copy(Tile NewTile)
-        {
-            //Create new block instance
-            Block NewBlock = new Block(this.Name, this.Solid, this.IsActive, this.Sprite);
-
-            //Returns null if NewTile is already filled
-            if (Methods.CanMoveBlock(NewBlock, NewTile))
-            {
-                Methods.MoveBlock(NewBlock, NewTile);
-                return NewBlock;
-            }
-
-            return null;
-        }
 
         //If IsActive is true, this methods runs each turn
         public virtual void Behaviour()
         {
         }
-
     }
 
 
@@ -91,7 +75,7 @@ namespace BlockSpace
         public TileSpawner TileSpawner;
         public bool Solid;
 
-        public BlockSpawner(string Name= "", Sprite Sprite = null, TileSpawner TileSpawner = null,bool Solid = true)
+        public BlockSpawner(TileSpawner TileSpawner,string Name= "", Sprite Sprite = null, bool Solid = true)
         {
             this.Name = Name;
             this.Sprite = Sprite;
@@ -111,7 +95,6 @@ namespace BlockSpace
         {}
 
     }
-
 }
 
 

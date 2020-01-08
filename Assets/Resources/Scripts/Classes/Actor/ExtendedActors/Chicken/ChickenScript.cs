@@ -62,8 +62,8 @@ namespace ActorSpace
         List<Tile> FlowerPath;
 
         //Basic constructor
-        public Chicken(Tile TileOfActor = null) 
-            : base("Chicken", Methods.LoadSprite("Scripts/GameStructure/Classes/Actor/ExtendedActors/Chicken/Chicken"),0,100,TileOfActor)
+        public Chicken(Tile TileOfActor) 
+            : base(TileOfActor,"Chicken", Methods.LoadSprite("Scripts/Classes/Actor/ExtendedActors/Chicken/Chicken"),0,100)
         {}
 
         public override Action Behaviour()
@@ -195,20 +195,15 @@ namespace ActorSpace
 
     public class ChickenSpawner : ActorSpawner
     {
-
         public ChickenSpawner(TileSpawner TileSpawner)
-        {
-            this.Name = "ChickenSpawner";
-            this.Sprite = Methods.LoadSprite("Scripts/GameStructure/Classes/Actor/ExtendedActors/Chicken/Chicken");
-            this.PlaceSpawner(TileSpawner);
-        }
+            : base(TileSpawner, "ChickenSpawner", Methods.LoadSprite("Scripts/Classes/Actor/ExtendedActors/Chicken/Chicken"))
+        {}
 
         public override void SpawnActor(Tile Tile)
         {
             new Chicken(Tile);
         }
     }
-
 }
 
 

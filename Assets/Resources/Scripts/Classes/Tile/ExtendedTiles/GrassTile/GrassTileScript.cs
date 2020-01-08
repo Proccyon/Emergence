@@ -20,7 +20,8 @@ namespace TileSpace
 
     public class GrassTile : Tile
     {
-        public GrassTile(Room RoomOfTile, int X=0, int Y=0, Actor ActorOfTile =null, Block BlockOfTile=null, Dictionary<Vector2Int, Wall> WallDict=null) : base(Methods.LoadSprite("Scripts/GameStructure/Classes/Tile/ExtendedTiles/GrassTile/GrassFloor"),"GrassTile",RoomOfTile, X, Y, ActorOfTile, BlockOfTile, WallDict)
+        public GrassTile(Room RoomOfTile, int X=0, int Y=0, Actor ActorOfTile =null, Block BlockOfTile=null, Dictionary<Vector2Int, Wall> WallDict=null) 
+            : base(Methods.LoadSprite("Scripts/Classes/Tile/ExtendedTiles/GrassTile/GrassFloor"),"GrassTile",RoomOfTile, X, Y, ActorOfTile, BlockOfTile, WallDict)
         {}
     }
 

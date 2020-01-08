@@ -19,10 +19,10 @@ namespace BlockSpace
 
         float ReproduceChance = 0.2f;
         int ReproduceRange = 5;
-        public static Block ExampleInstance = new Flower();
+        public static Block ExampleInstance = new Flower(null);
 
-        public Flower(Tile TileOfBlock = null) 
-            : base("Flower",false,true, Methods.LoadSprite("Scripts/GameStructure/Classes/Block/ExtendedBlocks/Flower/FlowersSprite"),TileOfBlock)
+        public Flower(Tile TileOfBlock) 
+            : base(TileOfBlock,"Flower", Methods.LoadSprite("Scripts/Classes/Block/ExtendedBlocks/Flower/FlowersSprite"),false,true)
         {}
 
         //Randomly places flowers in vicinity
@@ -30,8 +30,7 @@ namespace BlockSpace
         {
             if(Random.Range(0f, 2f) <= ReproduceChance)
             {
-
-                
+             
                 int x = TileOfBlock.X+Random.Range(-ReproduceRange, ReproduceRange + 1);
                 int y = TileOfBlock.Y+Random.Range(-ReproduceRange, ReproduceRange + 1);
 
@@ -48,7 +47,7 @@ namespace BlockSpace
     public class FlowerSpawner : BlockSpawner
     {
         public FlowerSpawner(TileSpawner TileSpawner) 
-            : base("FlowerSpawner", Methods.LoadSprite("Scripts/GameStructure/Classes/Block/ExtendedBlocks/Flower/FlowersSprite"),TileSpawner,false)
+            : base(TileSpawner,"FlowerSpawner", Methods.LoadSprite("Scripts/Classes/Block/ExtendedBlocks/Flower/FlowersSprite"),false)
         {}
 
         public override void SpawnBlock(Tile Tile)

@@ -21,7 +21,7 @@ namespace TileSpace
     public class RoadTile : Tile
     {
         public RoadTile(Room RoomOfTile, int X = 0, int Y = 0, Actor ActorOfTile = null, Block BlockOfTile = null, Dictionary<Vector2Int, Wall> WallDict = null) 
-            : base(Methods.LoadSprite("Scripts/GameStructure/Classes/Tile/ExtendedTiles/RoadTile/RoadFloor"), "RoadTile",RoomOfTile,X,Y,ActorOfTile,BlockOfTile,WallDict)
+            : base(Methods.LoadSprite("Scripts/Classes/Tile/ExtendedTiles/RoadTile/RoadFloor"), "RoadTile",RoomOfTile,X,Y,ActorOfTile,BlockOfTile,WallDict)
         {}
     }
 

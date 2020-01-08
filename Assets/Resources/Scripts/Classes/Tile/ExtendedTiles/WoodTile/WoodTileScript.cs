@@ -19,7 +19,7 @@ using GenericMethods;
 public class WoodTile : Tile
 {
     public WoodTile(Room RoomOfTile, int X = 0, int Y = 0, Actor ActorOfTile = null, Block BlockOfTile = null, Dictionary<Vector2Int, Wall> WallDict = null) 
-        : base(Methods.LoadSprite("Scripts/GameStructure/Classes/Tile/ExtendedTiles/WoodTile/WoodFloor"),"WoodTile",RoomOfTile,X,Y,ActorOfTile,BlockOfTile,WallDict)
+        : base(Methods.LoadSprite("Scripts/Classes/Tile/ExtendedTiles/WoodTile/WoodFloor"),"WoodTile",RoomOfTile,X,Y,ActorOfTile,BlockOfTile,WallDict)
     {}
 
 }

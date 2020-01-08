@@ -39,7 +39,7 @@ namespace ActorSpace
 
 
         //Initializes an actor with an empty inventory. It's safer to add items after initialization.
-        public Actor(string Name="", Sprite Sprite=null, int InventorySize=0, float MaxEnergy = 100, Tile TileOfActor = null)
+        public Actor(Tile TileOfActor,string Name="", Sprite Sprite=null, int InventorySize=0, float MaxEnergy = 100)
         {
             this.Name = Name;
             this.Sprite = Sprite;
@@ -88,12 +88,11 @@ namespace ActorSpace
         public Sprite Sprite;
         public TileSpawner TileSpawner;
 
-        public ActorSpawner(string Name = "", Sprite Sprite = null, TileSpawner TileSpawner = null)
+        public ActorSpawner(TileSpawner TileSpawner, string Name = "", Sprite Sprite = null )
         {
             this.Name = Name;
             this.Sprite = Sprite;
             this.PlaceSpawner(TileSpawner);
-
         }
 
         public void PlaceSpawner(TileSpawner TileSpawner)
