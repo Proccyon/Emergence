@@ -148,10 +148,13 @@ namespace RoomSpace
                 Wall LeftWall = Tile.WallDict[Vector2Int.left];
                 Wall DownWall = Tile.WallDict[Vector2Int.down];
 
-
+                //This method will draw walls twice. Cauces no issues but can be done more elegantly
+                //Same goes for poles
                 if (RightWall != null)
                 {
                     SpriteObjectList.Add(Methods.CreateSpriteObject(RightWall.WallSprite, Tile.X + 1f, Tile.Y + 0.5f, RightWall.Name, 3, RightWall.GetAngle()));
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(RightWall.PoleSprite, Tile.X + 1f, Tile.Y + 1f, RightWall.Name+"Pole", 4, 0,false));
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(RightWall.PoleSprite, Tile.X + 1f, Tile.Y, RightWall.Name+"Pole", 4, 0, false));
                 }
                 if (UpWall != null)
                 {

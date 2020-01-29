@@ -10,8 +10,8 @@ using GenericMethods;
 public class GrassTileSpawnerScript : CreateSpawnerScript
 {
 
-    public override void CreateSpawner(Structure Structure, int X, int Y)
+    public override void CreateSpawner(Structure Structure, float X, float Y)
     {
-        new GrassTileSpawner(Structure,X,Y);
+        new GrassTileSpawner(Structure,(int)X,(int)Y);
     }
 }

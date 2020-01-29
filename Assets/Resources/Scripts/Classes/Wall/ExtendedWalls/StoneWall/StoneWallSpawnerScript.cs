@@ -11,12 +11,9 @@ using GenericMethods;
 public class StoneWallSpawnerScript : CreateSpawnerScript
 {
 
-    public override void CreateSpawner(Structure Structure, int X, int Y)
+    public override void CreateSpawner(Structure Structure, float X, float Y)
     {
-        MonoBehaviour.print("jaap");
         Vector2Int Rotation = gameObject.GetComponent<WallGridScript>().WallRotation;
-        TileSpawner FrontTileSpawner = WallSpawner.FindFrontTileSpawner(Structure, X, Y,Rotation);
-        TileSpawner BackTileSpawner = WallSpawner.FindBackTileSpawner(Structure, X, Y, Rotation);
-        new StoneWallSpawner(FrontTileSpawner, BackTileSpawner);
+        new StoneWallSpawner(Structure,X,Y,Rotation);
     }
 }

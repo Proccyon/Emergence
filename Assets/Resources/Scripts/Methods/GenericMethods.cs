@@ -27,24 +27,10 @@ namespace GenericMethods
         //-----Movement Methods-----//
         //Methods that move instances, for example move an actor to a new tile.
 
-        //Checks if an actor can move to a given tile. Returns true if possible, returns false if not possible.
+        //Checks if an actor can move to a given tile. Does not check for walls, this should be seen as a teleport of sorts
         public static bool CanMoveActor(Actor Actor, Tile NewTile)
         {
-            //Return false if NewTile or Actor is set to null
-            if (NewTile == null || Actor == null)
-            {
-                return false;
-            }
-
-
-            //Return false if there is a solid block at the new tile.
-            if (NewTile.BlockOfTile != null && NewTile.BlockOfTile.Solid)
-            {
-                return false;
-            }
-
-            //returns true if no actor is present at NewTile, returns false if there is already an actor present
-            return (NewTile.ActorOfTile == null);
+            return (Actor != null && Tile.CanStandOnTile(NewTile));
         }
 
         //Same method as above but with x,y coordinates
@@ -226,7 +212,7 @@ namespace GenericMethods
         }
 
         //Creates a gameObject with the Sprite Sprite at position x,y
-        public static GameObject CreateSpriteObject(Sprite Sprite,float x,float y,string Name = "SpriteObject",int SortingOrder = 0,float Angle=0)
+        public static GameObject CreateSpriteObject(Sprite Sprite,float x,float y,string Name = "SpriteObject",int SortingOrder = 0,float Angle=0,bool AdjustScale=true)
         {
             
             GameObject SpriteObject = new GameObject(Name);
@@ -236,8 +222,11 @@ namespace GenericMethods
             Renderer.sprite = Sprite; //Set sprite
             Renderer.sortingOrder = SortingOrder; //Sorting order is the height of the draw layer
 
-            //Adjust the scale so sprite is 100 by 100
-            SpriteObject.transform.localScale *= 100 / Sprite.rect.height;
+            if (AdjustScale)
+            {
+                //Adjust the scale so sprite is 100 by 100
+                SpriteObject.transform.localScale *= 100 / Sprite.rect.height;
+            }
             return SpriteObject;
         }
 
@@ -250,10 +239,21 @@ namespace GenericMethods
             return Mathf.Sqrt(x * x + y * y);
         }
 
-        //Length of 2-dimensional vector (x1,y1) - (x2,y2)
+        //Distance between two vectors (x1,y1) and (x2,y2)
         public static float Distance(float x1, float y1, float x2, float y2)
         {
             return Length(x1 - x2, y1 - y2);
+        }
+
+        //Distance between two tiles, returns -1 if tiles not set correctly
+        public static float Distance(Tile Tile1, Tile Tile2)
+        {
+            if (Tile1 == null || Tile2 == null || Tile1.RoomOfTile != Tile2.RoomOfTile)
+            {
+                return -1;
+            }
+
+            return Distance(Tile1.X, Tile1.Y, Tile2.X, Tile2.Y);
         }
 
         public static bool IsInsideRoom(Room Room,int x,int y)
@@ -265,6 +265,11 @@ namespace GenericMethods
             return (x >= 0 && y >= 0 && x <= Room.Width - 1 && y <= Room.Height - 1);
         }
 
+        public static bool IsInsideRoom(int Width, int Height, int x, int y)
+        {
+            return (x >= 0 && y >= 0 && x <= Width - 1 && y <= Height - 1);
+        }
+
 
         //-----StructureMethods-----//
         //Methods related to structures. Might move this later if a better spot is found.
@@ -273,6 +278,7 @@ namespace GenericMethods
         //Only works during runtime.
         public static Structure LoadStructure(string PrefabName)
         {
+
             //The RoomControl prefab, prefab that contains everything in the structure
             var RoomControl = (GameObject)Resources.Load(PrefabName, typeof(GameObject));
             
@@ -282,18 +288,15 @@ namespace GenericMethods
             
             //Create a new empty structure we will fill afterwards
             Structure Structure = new Structure(StructureHeight, StructureWidth);
+            
             //All the scripts inside one SpawnerObject, see the for loop
             Component[] Scripts;
-
-            //The position of the object inside the structure
-            int x;
-            int y;
 
             //Goes through each child of RoomControl (Tiles, blocks, actors, etc.)
             foreach (Transform SpawnerObject in RoomControl.transform)
             {
-                x = (int)Mathf.Round(SpawnerObject.position.x-0.5f);
-                y = (int)Mathf.Round(SpawnerObject.position.y-0.5f);
+                float x = SpawnerObject.position.x-0.5f;
+                float y = SpawnerObject.position.y-0.5f;
 
                 //Gets all CreateSpawnerScripts inside SpawnerObject, defined in StructurePropertiesScript
                 //All CreateSpawnerScripts have a method CreateSpawner that adds a spawner to the sctructure

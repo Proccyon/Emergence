@@ -13,6 +13,7 @@ using ActionSpace;
 using ActorSpace;
 using TileSpace;
 using RoomSpace;
+using WallSpace;
 using GenericMethods;
 
 
@@ -30,28 +31,10 @@ namespace ActionSpace
             this.Activate = (Actor => MoveActor(Actor, NewTile));
         }
 
-        //Checks if actor can walk to given tile, NewTile has to be 1 tile away from actor
+        //Checks if actor can walk to given tile, NewTile has to be 1 tile away from actor (can be diagonal)
         public bool CanMove(Actor Actor, Tile NewTile)
         {
-
-            //Returns false if Actor has no tile or tile is the same as NewTile
-            if(Actor.TileOfActor == null || Actor.TileOfActor == NewTile)
-            {
-                return false;
-            }
-            //Checks for obstacles
-            if(!Methods.CanMoveActor(Actor, NewTile))
-            {
-                return false;
-            }
-            //Checks if NewTile has the same room as the actor
-            if(NewTile.RoomOfTile != Actor.TileOfActor.RoomOfTile)
-            {
-                return false;
-            }
-            //Checks if NewTile is 1 tile away from the actor
-            return Mathf.Abs(NewTile.X - Actor.TileOfActor.X) <= 1.1f && Mathf.Abs(NewTile.Y - Actor.TileOfActor.Y) <= 1.1f;
-
+            return Actor != null && Tile.CanMoveBetweenTiles(Actor.TileOfActor, NewTile);
         }
 
         public void MoveActor(Actor Actor, Tile NewTile)

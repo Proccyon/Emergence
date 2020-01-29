@@ -10,8 +10,8 @@ using GenericMethods;
 public class RoadTileSpawnerScript : CreateSpawnerScript
 {
 
-    public override void CreateSpawner(Structure Structure, int X, int Y)
+    public override void CreateSpawner(Structure Structure, float X, float Y)
     {
-        new RoadTileSpawner(Structure, X, Y);
+        new RoadTileSpawner(Structure, (int)X, (int)Y);
     }
 }

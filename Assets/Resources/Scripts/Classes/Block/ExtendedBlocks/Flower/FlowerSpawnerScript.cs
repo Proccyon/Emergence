@@ -10,8 +10,8 @@ using StructureSpace;
 public class FlowerSpawnerScript : CreateSpawnerScript
 {
 
-    public override void CreateSpawner(Structure Structure, int X, int Y)
+    public override void CreateSpawner(Structure Structure, float X, float Y)
     {
-        new FlowerSpawner(Structure.TileSpawnerArray[X, Y]);
+        new FlowerSpawner(Structure.TileSpawnerArray[(int)X, (int)Y]);
     }
 }

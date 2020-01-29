@@ -10,8 +10,8 @@ using TileSpace;
 public class ChickenSpawnerScript : CreateSpawnerScript
 {
 
-    public override void CreateSpawner(Structure Structure, int X, int Y)
+    public override void CreateSpawner(Structure Structure, float X, float Y)
     {
-        new ChickenSpawner(Structure.TileSpawnerArray[X,Y]);
+        new ChickenSpawner(Structure.TileSpawnerArray[(int)X,(int)Y]);
     }
 }

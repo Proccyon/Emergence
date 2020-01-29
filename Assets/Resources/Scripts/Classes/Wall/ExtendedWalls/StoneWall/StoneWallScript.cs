@@ -4,6 +4,7 @@ using UnityEngine;
 
 using WallSpace;
 using TileSpace;
+using StructureSpace;
 using GenericMethods;
 
 namespace WallSpace
@@ -18,8 +19,8 @@ namespace WallSpace
     public class StoneWallSpawner : WallSpawner
     {
 
-        public StoneWallSpawner(TileSpawner FrontTileSpawner, TileSpawner BackTileSpawner) 
-            : base(FrontTileSpawner,BackTileSpawner,"StoneWallSpawner", Methods.LoadSprite("Scripts/Classes/Wall/ExtendedWalls/StoneWall/StoneWall"))
+        public StoneWallSpawner(Structure Structure, float X, float Y, Vector2Int Rotation) 
+            : base(Structure,X,Y,Rotation,"StoneWallSpawner", Methods.LoadSprite("Scripts/Classes/Wall/ExtendedWalls/StoneWall/StoneWall"))
         {}
 
         public override Wall SpawnWall(Tile FrontTile, Tile BackTile)

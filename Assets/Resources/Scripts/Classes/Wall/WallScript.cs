@@ -45,6 +45,7 @@ namespace WallSpace
             this.Name = Name;
             this.Solid = Solid;
             this.WallSprite = WallSprite;
+            this.PoleSprite = PoleSprite;
 
             //Checks if given FrontTile and BackTile can contain the wall
             if(Methods.CanMoveWall(this,FrontTile,BackTile))
@@ -126,6 +127,16 @@ namespace WallSpace
             }
             return 0;
         }
+
+        //Checks if there is a solid wall next to a tile in a given direction
+        public static bool CheckIfSolidWall(Tile Tile, Vector2Int Direction)
+        {
+            if (Tile == null || Direction == null || Direction == Vector2Int.zero || Tile.WallDict[Direction] == null)
+            {
+                return false;
+            }
+            return Tile.WallDict[Direction].Solid;
+        }
     }
 
 
@@ -139,86 +150,44 @@ namespace WallSpace
 
         public static readonly Dictionary<Vector2Int, WallSpawner> EmptyWallSpawnerDict = new Dictionary<Vector2Int, WallSpawner>() { { Vector2Int.down, null }, { Vector2Int.up, null }, { Vector2Int.left, null }, { Vector2Int.right, null } };
 
-        public WallSpawner(TileSpawner FrontTileSpawner, TileSpawner BackTileSpawner,string Name = "", Sprite WallSpawnerSprite=null)
+        public WallSpawner(Structure Structure,float X,float Y, Vector2Int Rotation, string Name = "", Sprite WallSpawnerSprite=null)
         {
+            
             this.Name = Name;
             this.WallSpawnerSprite = WallSpawnerSprite;
-            this.Rotation = WallSpawner.GetRotation(FrontTileSpawner,BackTileSpawner);
+            this.Rotation = Rotation;
 
-            if (CheckWallSpawnerTiles(FrontTileSpawner,BackTileSpawner) && FrontTileSpawner.WallSpawnerDict[Rotation * -1] == null && BackTileSpawner.WallSpawnerDict[Rotation] == null)
+            int FrontX = (int)(X + Rotation.x * 0.5);
+            int FrontY = (int)(Y + Rotation.y * 0.5);
+            int BackX = (int)(X - Rotation.x * 0.5);
+            int BackY = (int)(Y - Rotation.y * 0.5);
+
+            if(Methods.IsInsideRoom(Structure.Width,Structure.Height,FrontX,FrontY))
+            {
+                this.FrontTileSpawner = Structure.TileSpawnerArray[FrontX, FrontY];
+            }
+            else
+            {
+                this.FrontTileSpawner = null;
+            }
+            if (Methods.IsInsideRoom(Structure.Width, Structure.Height, BackX, BackY))
+            {
+                this.BackTileSpawner = Structure.TileSpawnerArray[BackX, BackY];
+            }
+            else
+            {
+                this.BackTileSpawner = null;
+            }
+            
+
+            if ((FrontTileSpawner == null || FrontTileSpawner.WallSpawnerDict[Rotation * -1] == null) && (BackTileSpawner == null || BackTileSpawner.WallSpawnerDict[Rotation] == null))
             {
 
                 FrontTileSpawner.WallSpawnerDict[this.Rotation * -1] = this;
                 BackTileSpawner.WallSpawnerDict[this.Rotation] = this;
-
-                this.FrontTileSpawner = FrontTileSpawner;
-                this.BackTileSpawner = BackTileSpawner;
             }           
-
         }
 
-        //Checks if FrontTileSpawner ancd BackTileSpawner are indeed next to each other
-        public static bool CheckWallSpawnerTiles(TileSpawner FrontTileSpawner, TileSpawner BackTileSpawner)
-        {
-            //Checks if tiles exist and are in the same room
-            if (FrontTileSpawner == null || BackTileSpawner == null || FrontTileSpawner.Structure != BackTileSpawner.Structure)
-            {
-                return false;
-            }
-
-            //Finds distance between FrontTile and BackTile
-            var R = Mathf.Pow(Mathf.Pow((float)(FrontTileSpawner.X - BackTileSpawner.X), 2f) + Mathf.Pow((float)(FrontTileSpawner.Y - BackTileSpawner.Y), 2f), 0.5f);
-            return (R <= 1.01f && R >= 0.99f); //Check if distance is 1
-        }
-
-
-        //Sets the rotation based on position of FrontTileSpawner and BackTileSpawner
-        public static Vector2Int GetRotation(TileSpawner FrontTileSpawner, TileSpawner BackTileSpawner)
-        {
-            //If FrontTile and BackTile are not next to each other
-            if (!CheckWallSpawnerTiles(FrontTileSpawner, BackTileSpawner))
-            {
-                //Vector2Int.zero means rotation can not be determined because of incorrect Front/BackTiles
-                return Vector2Int.zero;
-            }
-            if (FrontTileSpawner.Y < BackTileSpawner.Y)
-            {
-                return Vector2Int.down;
-            }
-            if (FrontTileSpawner.X > BackTileSpawner.X)
-            {
-                return Vector2Int.right;
-            }
-            if (FrontTileSpawner.Y > BackTileSpawner.Y)
-            {
-                return Vector2Int.up;
-            }
-            if (FrontTileSpawner.X < BackTileSpawner.X)
-            {
-                return Vector2Int.left;
-            }
-            return Vector2Int.zero;
-        }
-
-        //Finds the FrontTileSpawner given the rotation and a position like (x,y) = (0.5,1)
-        //This is used for turning GameObjects in the editor into WallSpawner instances
-        public static TileSpawner FindFrontTileSpawner(Structure Structure, float x, float y, Vector2Int Rotation)
-        {
-            int FrontX = (int)(x + Rotation.x * 0.5);
-            int FrontY = (int)(y + Rotation.y * 0.5);
-
-            return Structure.TileSpawnerArray[FrontX, FrontY];
-        }
-
-        //Finds the BackTileSpawner given the rotation and a position like (x,y) = (0.5,1)
-        //This is used for turning GameObjects in the editor into WallSpawner instances
-        public static TileSpawner FindBackTileSpawner(Structure Structure, float x, float y, Vector2Int Rotation)
-        {
-            int BackX = (int)(x - Rotation.x * 0.5);
-            int BackY = (int)(y - Rotation.y * 0.5);
-
-            return Structure.TileSpawnerArray[BackX, BackY];
-        }
 
         public virtual Wall SpawnWall(Tile FrontTile, Tile BackTile)
         {

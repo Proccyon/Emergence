@@ -60,6 +60,7 @@ namespace ActorSpace
 
         int ViewRadius = 6;
         List<Tile> FlowerPath;
+        Tile RandomTile;
 
         //Basic constructor
         public Chicken(Tile TileOfActor) 
@@ -68,6 +69,7 @@ namespace ActorSpace
 
         public override Action Behaviour()
         {
+
             if (Energy < WalkAction.StaticEnergyCost && Energy < EatFlowerAction.StaticEnergyCost)
             {
                 return new PassAction(this);
@@ -84,14 +86,32 @@ namespace ActorSpace
                 Tile FlowerTile = FindClosestFlower();
                 if(FlowerTile == null)
                 {
-                    return new WalkAction(FindRandomTile());
+                    RandomTile = FindRandomTile();
+                    if(RandomTile == null)
+                    {
+                        return new PassAction(this);
+                    }
+                    else
+                    {
+                        return new WalkAction(RandomTile);
+                    }                    
                 }
                 else
                 {
                     FlowerPath = BM.GetPathToTile(TileOfActor, FlowerTile, this);
-                    if(FlowerPath == null)
+                    
+                    if (FlowerPath == null)
                     {
-                        return new WalkAction(FindRandomTile()); 
+
+                        RandomTile = FindRandomTile();
+                        if (RandomTile == null)
+                        {
+                            return new PassAction(this);
+                        }
+                        else
+                        {
+                            return new WalkAction(RandomTile);
+                        }
                     }
                     return Behaviour();
                 }
@@ -168,13 +188,9 @@ namespace ActorSpace
             {
                 for (int dy = -1; dy <= 1; dy++)
                 {
-                    if(dx == 0 && dy == 0)
-                    {
-                        continue;
-                    }
 
                     //Checks if actor can move to the tile at (X0+dx,Y0+dy)
-                    if (Methods.CanMoveActor(this, TileOfActor.X + dx, TileOfActor.Y + dy))
+                    if (Tile.CanMoveBetweenTiles(TileOfActor,dx,dy))
                     {
 
                         //Add the tile at (X0+dx,Y0+dy) to the List ValidTiles

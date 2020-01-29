@@ -10,8 +10,8 @@ using GenericMethods;
 public class WoodTileSpawnerScript : CreateSpawnerScript
 {
 
-    public override void CreateSpawner(Structure Structure, int X, int Y)
+    public override void CreateSpawner(Structure Structure, float X, float Y)
     {
-        new WoodTileSpawner(Structure, X, Y);
+        new WoodTileSpawner(Structure, (int)X, (int)Y);
     }
 }

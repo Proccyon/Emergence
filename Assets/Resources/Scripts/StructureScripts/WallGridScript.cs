@@ -34,23 +34,33 @@ public class WallGridScript : MonoBehaviour
 
     void Update()
     {
+
         Vector3 CurrentPosition = transform.position;
+
+        //Position of wall when being held with the cursor
         float OldX = CurrentPosition.x;
         float OldY = CurrentPosition.y;
         float OldZ = CurrentPosition.z;
 
+        //x,y if wall is set to the nearest vertical position
         float VerticalX = RoundComponentWhole(GridSize, PixelsPerUnit, CurrentPosition.x);
         float VerticalY = RoundComponentHalf(GridSize, PixelsPerUnit, CurrentPosition.y);
 
+        //x,y if wall is set to the nearest horizontal position
         float HorizontalX = RoundComponentHalf(GridSize, PixelsPerUnit, CurrentPosition.x);
         float HorizontalY = RoundComponentWhole(GridSize, PixelsPerUnit, CurrentPosition.y);
 
+        //Distances from cursor to vertical and horizontal position
         float VerticalDistance = Methods.Distance(OldX, OldY, VerticalX, VerticalY);
         float HorizontalDistance = Methods.Distance(OldX, OldY, HorizontalX, HorizontalY);
 
+        //Move the wall to the position that is closest of the two
         if (VerticalDistance <= HorizontalDistance)
         {
+            //-1.5 is set so the wall appears above tiles, blocks, etc
             transform.position = new Vector3(VerticalX, VerticalY, -1.5f);
+
+            //RotateWall determines which direction the wall is aiming at, its set in the editor
             if(RotateWall)
             {
                 transform.eulerAngles = new Vector3(0, 0, 180);

@@ -87,7 +87,7 @@ public class RoomRunner : MonoBehaviour
     //Runs .Behaviour method for all actors and active blocks. These are stored in WrapperList
     public void DoTurn()
     {
-        MonoBehaviour.print("Turn Done");
+
         TurnCount += 1;
         MonoBehaviour.print("TurnCount: "+TurnCount.ToString());
         int ActionCount = 0; //Used to prevent endless loop
@@ -97,7 +97,7 @@ public class RoomRunner : MonoBehaviour
         for (RunCount = 0; RunCount < WrapperList.Count; RunCount++) //Goes through WrapperList
         {
             ObjectWrapper Wrapper = WrapperList[RunCount]; //Convenience
-
+            
             //Remove Wrapper from list if it is empty or actor/block tiles are inconsistent.
             if
             (
@@ -110,9 +110,9 @@ public class RoomRunner : MonoBehaviour
                 RunCount -= 1;
                 continue;
             }
-
+            
             //Checks if actor is set
-            if(Wrapper.Actor != null)
+            if (Wrapper.Actor != null)
             {
                 
                 ActionCount = 0; 
@@ -122,18 +122,19 @@ public class RoomRunner : MonoBehaviour
                 //Keep running .Behaviour untill energy runs out
                 while(Wrapper.Actor.Energy > 0)
                 {
+                    
                     //Prevents endless loop, some actions might not cost energy
-                    if(ActionCount >= ActionLimit)
+                    if (ActionCount >= ActionLimit)
                     {
                         print("Action Count exceeded limit for "+Wrapper.Actor.Name);
-                        continue;
+                        break;
                     }
 
                     //Runs .Behaviour to get the action the actor wants to perform
                     NewAction = Wrapper.Actor.Behaviour();
 
                     //Checks if Actor has enought energy and nothing is preventing the action. Actors should check this themselves, this just prevents bugs
-                    if(NewAction.EnergyCost <= Wrapper.Actor.Energy && NewAction.CanActivate(Wrapper.Actor))
+                    if (NewAction.EnergyCost <= Wrapper.Actor.Energy && NewAction.CanActivate(Wrapper.Actor))
                     {
                         //Performs the action
                         NewAction.Activate(Wrapper.Actor);
@@ -143,7 +144,8 @@ public class RoomRunner : MonoBehaviour
                     {
                         //Sends a message so the bug can be found
                         print(Wrapper.Actor.Name +" instance returned action that could not be activated!");
-                        continue;
+                        
+                        break;
                     }
                     ActionCount += 1;
                 }
@@ -156,7 +158,7 @@ public class RoomRunner : MonoBehaviour
                 Wrapper.Block.Behaviour();
             }
         }
-
+        
         IsRunning = false;
 
         //Draws the room

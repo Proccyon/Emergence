@@ -40,8 +40,10 @@ namespace BehaviourMethods
 
             int X0;
             int Y0;
+
             while (WalkerList.Count > 0)
             {
+                
                 //Goes through all walkers and add newwalkers to all tiles next to them
                 foreach (List<Tile> Walker in WalkerList)
                 {
@@ -55,7 +57,7 @@ namespace BehaviourMethods
                         {
                             //Checks if given Tile can be walked over and if walkers have not reached it yet
                             //Second condition will not be out of bounds because the first condition will then be false
-                            if (Methods.CanMoveActor(WalkingActor, X0 + dx, Y0 + dy) && !WalkedArray[X0 + dx, Y0 + dy])
+                            if (Tile.CanMoveBetweenTiles(TileArray[X0,Y0],dx,dy) && !WalkedArray[X0 + dx, Y0 + dy])
                             {
                                 //Set WalkedArray element to true so it cant be moved to again
                                 WalkedArray[X0 + dx, Y0 + dy] = true;
@@ -81,6 +83,7 @@ namespace BehaviourMethods
                 }
                 WalkerList = NewWalkerList;
                 NewWalkerList = new List<List<Tile>>();
+
             }
             //No path is found so return null
             return null;
