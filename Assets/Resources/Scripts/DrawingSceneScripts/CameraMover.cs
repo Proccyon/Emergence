@@ -17,7 +17,7 @@ public class CameraMover : MonoBehaviour
     public string CameraName = "Main Camera";
     public float RoomHeight;
     public float RoomWidth;
-    public float BorderSize = 2;
+    public float BorderSize = 0;
 
     public float NewZoomPos(float ZoomRatio, float Xm, float OldX)
     {

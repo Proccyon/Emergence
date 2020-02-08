@@ -34,10 +34,10 @@ namespace GenericMethods
         }
 
         //Same method as above but with x,y coordinates
-        public static bool CanMoveActor(Actor Actor,int x,int y)
+        public static bool CanMoveActor(Actor Actor, int x, int y)
         {
             //Checks if (x,y) is inside the room   
-            if(IsInsideRoom(Actor.TileOfActor.RoomOfTile,x,y))
+            if (IsInsideRoom(Actor.TileOfActor.RoomOfTile, x, y))
             {
                 //Uses above method
                 return CanMoveActor(Actor, Actor.TileOfActor.RoomOfTile.TileArray[x, y]);
@@ -53,7 +53,7 @@ namespace GenericMethods
 
                 //Checks if Actor was previously on a tile
                 if (Actor.TileOfActor != null)
-                { 
+                {
                     Actor.TileOfActor.ActorOfTile = null; //Removes actor from old tile
                 }
                 Actor.TileOfActor = NewTile; //changes tile propery of the actor
@@ -65,7 +65,7 @@ namespace GenericMethods
         public static void MoveActor(Actor Actor, int x, int y)
         {
 
-            if(CanMoveActor(Actor,x,y))
+            if (CanMoveActor(Actor, x, y))
             {
                 Tile NewTile = Actor.TileOfActor.RoomOfTile.TileArray[x, y];
 
@@ -79,17 +79,17 @@ namespace GenericMethods
         }
 
         //Checks if a block can be moved to a given tile
-        public static bool CanMoveBlock(Block Block,Tile NewTile)
+        public static bool CanMoveBlock(Block Block, Tile NewTile)
         {
-            
+
             //Return false if given tile or block is null
-            if(NewTile == null || Block == null)
+            if (NewTile == null || Block == null)
             {
                 return false;
             }
 
             //Return false if there is an actor at the new tile and block is solid
-            if(NewTile.ActorOfTile != null && Block.Solid)
+            if (NewTile.ActorOfTile != null && Block.Solid)
             {
                 return false;
             }
@@ -99,25 +99,25 @@ namespace GenericMethods
 
         }
 
-        public static bool CanMoveBlock(Block Block, int x, int y,Room ThisRoom =null)
+        public static bool CanMoveBlock(Block Block, int x, int y, Room ThisRoom = null)
         {
-            if(ThisRoom == null)
+            if (ThisRoom == null)
             {
                 ThisRoom = Block.TileOfBlock.RoomOfTile;
             }
             if (IsInsideRoom(ThisRoom, x, y))
             {
-                return CanMoveBlock(Block,ThisRoom.TileArray[x,y]);
+                return CanMoveBlock(Block, ThisRoom.TileArray[x, y]);
             }
             return false;
         }
-         
+
         public static void MoveBlock(Block Block, Tile NewTile)
         {
             //Checks if Block can indeed be moved to the new tile
-            if(CanMoveBlock(Block,NewTile))
+            if (CanMoveBlock(Block, NewTile))
             {
-                if(Block.TileOfBlock != null)
+                if (Block.TileOfBlock != null)
                 {
                     Block.TileOfBlock.BlockOfTile = null; //Removes block of previous tile
                 }
@@ -140,62 +140,122 @@ namespace GenericMethods
         {
             if (CanMoveItem(Item, NewContainer))
             {
-                if(Item.ContainerOfItem != null)
+                if (Item.ContainerOfItem != null)
                 {
                     Item.ContainerOfItem.ItemOfContainer = null;//Empties the container that used to hold the item.
                 }
-                
+
                 Item.ContainerOfItem = NewContainer; //Changes the container of the item.
                 NewContainer.ItemOfContainer = Item; //Changes the item of the new container.
             }
         }
 
-        //Checks if a wall can be moved to the edge between NewFrontTile and NewBackTile
-        public static bool CanMoveWall(Wall Wall, Tile NewFrontTile, Tile NewBackTile)
+        //Checks if a wall can be moved to ReferenceTile.WallDict[Direction]
+        public static bool CanMoveWall(Tile ReferenceTile, Vector2Int Direction, Vector2Int Rotation)
         {
-
-            //How NewFrontTile and NewBackTile are aligned(ex. FrontTile is east of BackTile --> Rotation = (1,0))
-            Vector2Int Rotation = Wall.GetRotation(NewFrontTile, NewBackTile);
-
-            if (Rotation == Vector2Int.zero) //Returns false if NewFrontTile and NewBackTile are not next to each other
+            //Check if everything is set
+            if (ReferenceTile == null || Direction == null || Rotation == null || ReferenceTile.WallDict == null)
             {
                 return false;
             }
-
-            //Checks if walls already exist at NewFrontTile and NewBackTile
-            return NewFrontTile.WallDict[Rotation * -1] == null && NewBackTile.WallDict[Rotation] == null;
-
+            //Check if direction is parallel to Rotation
+            if(!(Direction == Rotation || Direction == Rotation *-1))
+            {
+                return false;
+            }
+            //Check if room is set
+            if(ReferenceTile.RoomOfTile == null)
+            {
+                return false;
+            }
+            //Finally check if the spot is already occupied by another wall
+            return ReferenceTile.WallDict[Direction] == null;           
         }
 
-        //Moves a wall to the edge between NewFrontTile and NewBackTile
-        public static void MoveWall(Wall Wall, Tile NewFrontTile, Tile NewBackTile)
+        //Moves a wall to ReferenceTile.WallDict[Direction] and change rotation
+        public static void MoveWall(Wall Wall,Tile ReferenceTile, Vector2Int Direction, Vector2Int Rotation)
         {
-            //Chekcs if wall can be moved at all
-            if (CanMoveWall(Wall,NewFrontTile,NewBackTile))
+            //Check if wall can be moved at all
+            if (CanMoveWall(ReferenceTile,Direction,Rotation))
             {
-                //The rotation of the wall after it is moved
-                Vector2Int NewRotation = Wall.GetRotation(NewFrontTile, NewBackTile);
+                ReferenceTile.WallDict[Direction] = Wall; //Reference this in the reference tile
+                Tile OppositeTile = null;
 
-                //Reference the wall in the new tiles
-                NewFrontTile.WallDict[NewRotation * -1] = Wall;
-                NewBackTile.WallDict[NewRotation] = Wall;
-
-                //Remove the reference to the wall in the old tiles
-                if (Wall.FrontTile != null)
+                //Checks if the tile on the other side of the wall is inside the room
+                if (Methods.IsInsideRoom(ReferenceTile.RoomOfTile, ReferenceTile.X + Direction.x, ReferenceTile.Y + Direction.y))
                 {
-                    Wall.FrontTile.WallDict[Wall.Rotation * -1] = null;
-                }
-                if (Wall.BackTile != null)
-                {
-                    Wall.BackTile.WallDict[Wall.Rotation] = null;
+                    //Find the tile on the other side of the wall
+                    OppositeTile = ReferenceTile.RoomOfTile.TileArray[ReferenceTile.X + Direction.x, ReferenceTile.Y + Direction.y];
+                    OppositeTile.WallDict[Direction * -1] = Wall; //Reference this in the opposite tile
                 }
 
-                //Reference the new tiles in the wall
-                Wall.FrontTile = NewFrontTile;
-                Wall.BackTile = NewBackTile;
-                Wall.Rotation = NewRotation;
+                if (Direction == Rotation)
+                {
+                    Wall.FrontTile = OppositeTile;
+                    Wall.BackTile = ReferenceTile;
+                }
+                else
+                {
+                    Wall.FrontTile = ReferenceTile;
+                    Wall.BackTile = OppositeTile;
+                }
+                Wall.Rotation = Rotation;
             }
         }
+
+        //Checks if a wallSpawner can be moved to the given direction
+        public static bool CanMoveWallSpawner(TileSpawner ReferenceTileSpawner, Vector2Int Direction, Vector2Int Rotation)
+        {
+            //Check if everything is set
+            if (ReferenceTileSpawner == null || Direction == null || Rotation == null || ReferenceTileSpawner.WallSpawnerDict == null)
+            {
+                return false;
+            }
+            //Check if direction is parallel to Rotation
+            if (!(Direction == Rotation || Direction == Rotation * -1))
+            {
+                return false;
+            }
+            //Check if structure is set
+            if (ReferenceTileSpawner.Structure == null)
+            {
+                return false;
+            }
+            //Finally check if the spot is already occupied by another wallSpawner
+            return ReferenceTileSpawner.WallSpawnerDict[Direction] == null;
+        }
+
+        //Moves a given wall spawner to the new position
+        public static void MoveWallSpawner(WallSpawner WallSpawner, TileSpawner ReferenceTileSpawner, Vector2Int Direction, Vector2Int Rotation)
+        {
+            if (CanMoveWallSpawner(ReferenceTileSpawner, Direction, Rotation) && WallSpawner != null)
+            {
+
+                ReferenceTileSpawner.WallSpawnerDict[Direction] = WallSpawner; //Reference this in the reference tile
+                TileSpawner OppositeTileSpawner = null;
+
+                //Checks if the tileSpawner on the other side of the wallSpawner is inside the room
+                if (Methods.IsInsideRoom(ReferenceTileSpawner.Structure.Width, ReferenceTileSpawner.Structure.Height, ReferenceTileSpawner.X + Direction.x, ReferenceTileSpawner.Y + Direction.y))
+                {
+                    //Find the tile on the other side of the wallSpawner
+                    OppositeTileSpawner = ReferenceTileSpawner.Structure.TileSpawnerArray[ReferenceTileSpawner.X + Direction.x, ReferenceTileSpawner.Y + Direction.y];
+                    OppositeTileSpawner.WallSpawnerDict[Direction * -1] = WallSpawner; //Reference this in the opposite tile
+                }
+
+                if (Direction == Rotation)
+                {
+                    WallSpawner.FrontTileSpawner = OppositeTileSpawner;
+                    WallSpawner.BackTileSpawner = ReferenceTileSpawner;
+                }
+                else
+                {
+                    WallSpawner.FrontTileSpawner = ReferenceTileSpawner;
+                    WallSpawner.BackTileSpawner = OppositeTileSpawner;
+                }
+                WallSpawner.Rotation = Rotation;
+            }
+        }
+
 
 
         //-----Sprite methods-----//

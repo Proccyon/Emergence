@@ -21,12 +21,12 @@ namespace TileSpace
 {
 
     //RoomOfTile: The room the tile is in (ex. above ground, inside a dungeon). Is null when Tile is part of a structure.
-    //x: The x coordinate of the tile within the room. x=0 is left
-    //y: The y coordinate of the tile within the room. y= 0 is the bottom (so x=0,y=0 is the bottom left corner of the room)
+    //X: The x coordinate of the tile within the room. x=0 is left
+    //Y: The y coordinate of the tile within the room. y= 0 is the bottom (so x=0,y=0 is the bottom left corner of the room)
     //Sprite: The appearance of the tile. Should be square.
     //ActorOfTile: The Actor that is standing on the tile. No more than 1 actor can stand on a tile. Variable is Null if no actors are on the tile.
     //BlockOfTile: The Block standing on the tile (A table, Stone, etc.). No more than 1 block can stand on a tile. If the block is solid no actors can move to this tile (ActorOfTile should be None).
-
+    //WallDict: A dictionary that describes the walls next to this tile. The keys are 2d vectors. So WallDict[(0,1)] = WallDict[Vector2Int.up] gives the wall north of the tile
     public class Tile
     {
 
@@ -144,40 +144,58 @@ namespace TileSpace
         public BlockSpawner BlockSpawner;
         public Dictionary<Vector2Int, WallSpawner> WallSpawnerDict;
 
-        public TileSpawner(string Name = "",Structure Structure = null, int X = 0, int Y = 0, Dictionary<Vector2Int, WallSpawner> WallSpawnerDict = null)
+        public TileSpawner(string Name = "",Structure Structure = null, int X = 0, int Y = 0)
         {
             this.Name = Name;
             this.X = X;
             this.Y = Y;
             this.Structure = Structure;
+            this.WallSpawnerDict = new Dictionary<Vector2Int, WallSpawner>(WallSpawner.EmptyWallSpawnerDict);
 
-            if(WallSpawnerDict == null)
-            {
-                this.WallSpawnerDict = new Dictionary<Vector2Int, WallSpawner>(WallSpawner.EmptyWallSpawnerDict);
-            }
-            else
-            {
-                this.WallSpawnerDict = WallSpawnerDict;
-            }
 
             if (Structure != null)
             {
-                if (Structure.TileSpawnerArray[X, Y] != null)
+                TileSpawner OldTileSpawner = Structure.TileSpawnerArray[X, Y];
+                if (OldTileSpawner != null)
                 {
-                    if (Structure.TileSpawnerArray[X, Y].ActorSpawner != null)
+                    //Moves the walls that where at OldTileSpaner to this tile
+                    WallSpawner UpWallSpawner = OldTileSpawner.WallSpawnerDict[Vector2Int.up];
+                    WallSpawner RightWallSpawner = OldTileSpawner.WallSpawnerDict[Vector2Int.right];
+                    WallSpawner DownWallSpawner = OldTileSpawner.WallSpawnerDict[Vector2Int.down];
+                    WallSpawner LeftWallSpawner = OldTileSpawner.WallSpawnerDict[Vector2Int.left];
+
+                    if (UpWallSpawner != null)
                     {
-                        this.ActorSpawner = Structure.TileSpawnerArray[X, Y].ActorSpawner;
-                        Structure.TileSpawnerArray[X, Y].ActorSpawner.TileSpawner = this;
-                        Structure.TileSpawnerArray[X, Y].ActorSpawner = null;
+                        Methods.MoveWallSpawner(UpWallSpawner, this, Vector2Int.up,UpWallSpawner.Rotation);
+                    }
+                    if (RightWallSpawner != null)
+                    {
+                        Methods.MoveWallSpawner(RightWallSpawner, this, Vector2Int.right, RightWallSpawner.Rotation);
+                    }
+                    if (DownWallSpawner != null)
+                    {
+                        Methods.MoveWallSpawner(DownWallSpawner, this, Vector2Int.down, DownWallSpawner.Rotation);
+                    }
+                    if (LeftWallSpawner != null)
+                    {
+                        Methods.MoveWallSpawner(LeftWallSpawner, this, Vector2Int.left, LeftWallSpawner.Rotation);
                     }
 
-                    if (Structure.TileSpawnerArray[X, Y].BlockSpawner != null && (this.ActorSpawner == null || Structure.TileSpawnerArray[X, Y].BlockSpawner.Solid == false))
+                    //If there already was a TileSpawner at (X,Y) with an ActorSpawner move the ActorSpawner to this
+                    if (OldTileSpawner.ActorSpawner != null)
+                    {
+                        this.ActorSpawner = OldTileSpawner.ActorSpawner;
+                        OldTileSpawner.ActorSpawner.TileSpawner = this;
+                        OldTileSpawner.ActorSpawner = null;
+                    }
+                    //If there already was a TileSpawner at (X,Y) with a |BlockSpawner move the BlockSpawner to this
+                    if (OldTileSpawner.BlockSpawner != null && (this.ActorSpawner == null || OldTileSpawner.BlockSpawner.Solid == false))
                     {
                         this.BlockSpawner = Structure.TileSpawnerArray[X, Y].BlockSpawner;
-                        Structure.TileSpawnerArray[X, Y].BlockSpawner.TileSpawner = this;
-                        Structure.TileSpawnerArray[X, Y].BlockSpawner = null;
-                    }
-                    Structure.TileSpawnerArray[X, Y].Structure = null;
+                        OldTileSpawner.BlockSpawner.TileSpawner = this;
+                        OldTileSpawner.BlockSpawner = null;
+                    }        
+                    OldTileSpawner.Structure = null;
                 }
 
                 Structure.TileSpawnerArray[X, Y] = this;

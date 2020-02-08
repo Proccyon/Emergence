@@ -11,8 +11,8 @@ namespace WallSpace
 {
     public class StoneWall : Wall
     {
-        public StoneWall(Tile FrontTile,Tile BackTile) 
-            : base(FrontTile,BackTile,"StoneWall", Methods.LoadSprite("Scripts/Classes/Wall/ExtendedWalls/StoneWall/StoneWall"), Methods.LoadSprite("Scripts/Classes/Wall/ExtendedWalls/StoneWall/StoneWallPole"),true)
+        public StoneWall(Tile ReferenceTile, Vector2Int Direction, Vector2Int Rotation) 
+            : base(ReferenceTile,Direction,Rotation,"StoneWall", Methods.LoadSprite("Scripts/Classes/Wall/ExtendedWalls/StoneWall/StoneWallSprite"), Methods.LoadSprite("Scripts/Classes/Wall/ExtendedWalls/StoneWall/StoneWallPole"),true)
         {}
     }
 
@@ -20,12 +20,12 @@ namespace WallSpace
     {
 
         public StoneWallSpawner(Structure Structure, float X, float Y, Vector2Int Rotation) 
-            : base(Structure,X,Y,Rotation,"StoneWallSpawner", Methods.LoadSprite("Scripts/Classes/Wall/ExtendedWalls/StoneWall/StoneWall"))
+            : base(Structure,X,Y,Rotation,"StoneWallSpawner", Methods.LoadSprite("Scripts/Classes/Wall/ExtendedWalls/StoneWall/StoneWallSprite"))
         {}
 
-        public override Wall SpawnWall(Tile FrontTile, Tile BackTile)
+        public override Wall SpawnWall(Tile ReferenceTile, Vector2Int Direction)
         {
-            return new StoneWall(FrontTile, BackTile);
+            return new StoneWall(ReferenceTile,Direction,this.Rotation);
         }
     }
 

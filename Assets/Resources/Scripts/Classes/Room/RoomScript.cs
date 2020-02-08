@@ -45,44 +45,59 @@ namespace RoomSpace
 
             }
 
+            //Goes through every TileSpawner in the structure
             for (int x = 0; x < Structure.Width; x++)
             {
                 for (int y = 0; y < Structure.Height; y++)
                 {
-                    TileSpawner TileSpawner = Structure.TileSpawnerArray[x, y];
-                    Tile NewTile = TileSpawner.SpawnTile(this, x, y,this.TileArray[x,y].WallDict);
+                   
+                    TileSpawner TileSpawner = Structure.TileSpawnerArray[x, y]; //TileSpawner at (x,y)
+                    Tile NewTile = TileSpawner.SpawnTile(this, x, y,this.TileArray[x,y].WallDict); //Creates a new tile based on TileSpawner
                     
+                    //Create a new actor at the tile based on ActorSpawner 
                     if (TileSpawner.ActorSpawner != null)
                     {
                         TileSpawner.ActorSpawner.SpawnActor(NewTile);
                     }
-                    if(TileSpawner.BlockSpawner != null)
+                    //Create a new block at the tile based on BlockSpawner 
+                    if (TileSpawner.BlockSpawner != null)
                     {
                         TileSpawner.BlockSpawner.SpawnBlock(NewTile);
                     }
 
-                    //This method excludes walls on the west/south side of the border, there shouldn't be walls there anyway
-                    WallSpawner TopWallSpawner = TileSpawner.WallSpawnerDict[Vector2Int.up];
-                    WallSpawner RightWallSpawner = TileSpawner.WallSpawnerDict[Vector2Int.right];
+                    //The WallSpawners to the left and bottom of the tile
+                    WallSpawner LeftWallSpawner = TileSpawner.WallSpawnerDict[Vector2Int.left];
+                    WallSpawner DownWallSpawner = TileSpawner.WallSpawnerDict[Vector2Int.down];
 
-                    if(TopWallSpawner != null && TopWallSpawner.Rotation == Vector2Int.up)
+                    //Spawn a wall to the left based on LeftWallSpawner
+                    if(LeftWallSpawner != null)
                     {
-                        TopWallSpawner.SpawnWall(this.TileArray[x, y + 1], this.TileArray[x, y]);
+                        LeftWallSpawner.SpawnWall(NewTile, Vector2Int.left);
                     }
-                    if(TopWallSpawner != null && TopWallSpawner.Rotation == Vector2Int.down)
+                    //Spawn a wall to the bottom based on DownWallSpawner
+                    if (DownWallSpawner != null)
                     {
-                        TopWallSpawner.SpawnWall(this.TileArray[x, y], this.TileArray[x, y+1]);
-                    }
-                    if (RightWallSpawner != null && RightWallSpawner.Rotation == Vector2Int.right)
-                    {
-                        RightWallSpawner.SpawnWall(this.TileArray[x+1, y], this.TileArray[x, y]);
-                    }
-                    if (RightWallSpawner != null && RightWallSpawner.Rotation == Vector2Int.left)
-                    {
-                        RightWallSpawner.SpawnWall(this.TileArray[x, y], this.TileArray[x+1, y]);
+                        DownWallSpawner.SpawnWall(NewTile, Vector2Int.down);
                     }
 
-
+                    //Walls on the top and right are only spawned on the border
+                    //Otherwise walls would be initialized twice
+                    if(x == Structure.Width - 1)
+                    {
+                        WallSpawner RightWallSpawner = TileSpawner.WallSpawnerDict[Vector2Int.right];
+                        if (RightWallSpawner != null)
+                        {
+                            RightWallSpawner.SpawnWall(NewTile, Vector2Int.right);
+                        }
+                    }
+                    if (y == Structure.Height - 1)
+                    {
+                        WallSpawner UpWallSpawner = TileSpawner.WallSpawnerDict[Vector2Int.up];
+                        if (UpWallSpawner != null)
+                        {
+                            UpWallSpawner.SpawnWall(NewTile, Vector2Int.up);
+                        }
+                    }
                 }
             }
         }
@@ -150,23 +165,30 @@ namespace RoomSpace
 
                 //This method will draw walls twice. Cauces no issues but can be done more elegantly
                 //Same goes for poles
-                if (RightWall != null)
-                {
-                    SpriteObjectList.Add(Methods.CreateSpriteObject(RightWall.WallSprite, Tile.X + 1f, Tile.Y + 0.5f, RightWall.Name, 3, RightWall.GetAngle()));
-                    SpriteObjectList.Add(Methods.CreateSpriteObject(RightWall.PoleSprite, Tile.X + 1f, Tile.Y + 1f, RightWall.Name+"Pole", 4, 0,false));
-                    SpriteObjectList.Add(Methods.CreateSpriteObject(RightWall.PoleSprite, Tile.X + 1f, Tile.Y, RightWall.Name+"Pole", 4, 0, false));
-                }
-                if (UpWall != null)
-                {
-                    SpriteObjectList.Add(Methods.CreateSpriteObject(UpWall.WallSprite, Tile.X + 0.5f, Tile.Y + 1f, UpWall.Name, 3, UpWall.GetAngle()));
-                }
+
                 if (LeftWall != null)
                 {
                     SpriteObjectList.Add(Methods.CreateSpriteObject(LeftWall.WallSprite, Tile.X, Tile.Y + 0.5f, LeftWall.Name, 3, LeftWall.GetAngle()));
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(LeftWall.PoleSprite, Tile.X, Tile.Y+1f, LeftWall.Name + "Pole", LeftWall.PolePriority + 4, 0, false));
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(LeftWall.PoleSprite, Tile.X, Tile.Y, LeftWall.Name + "Pole", LeftWall.PolePriority + 4,0, false));
                 }
                 if (DownWall != null)
                 {
                     SpriteObjectList.Add(Methods.CreateSpriteObject(DownWall.WallSprite, Tile.X + 0.5f, Tile.Y, DownWall.Name, 3, DownWall.GetAngle()));
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(DownWall.PoleSprite, Tile.X, Tile.Y, DownWall.Name + "Pole", DownWall.PolePriority + 4, 0, false));
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(DownWall.PoleSprite, Tile.X + 1f, Tile.Y, DownWall.Name + "Pole", DownWall.PolePriority + 4,0, false));
+                }
+                if (RightWall != null && Tile.X == this.Width- 1)
+                {
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(RightWall.WallSprite, Tile.X + 1f, Tile.Y + 0.5f, RightWall.Name, 3, RightWall.GetAngle()));
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(RightWall.PoleSprite, Tile.X + 1f, Tile.Y + 1f, RightWall.Name + "Pole", RightWall.PolePriority+4, 0, false));
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(RightWall.PoleSprite, Tile.X + 1f, Tile.Y, RightWall.Name + "Pole", RightWall.PolePriority+4,0, false));
+                }
+                if (UpWall != null && Tile.Y == this.Height - 1)
+                {
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(UpWall.WallSprite, Tile.X + 0.5f, Tile.Y + 1f, UpWall.Name, 3, UpWall.GetAngle()));
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(UpWall.PoleSprite, Tile.X , Tile.Y+1f, UpWall.Name + "Pole", UpWall.PolePriority+4, 0, false));
+                    SpriteObjectList.Add(Methods.CreateSpriteObject(UpWall.PoleSprite, Tile.X + 1f, Tile.Y+1f, UpWall.Name + "Pole", UpWall.PolePriority+4,0, false));
                 }
 
             }

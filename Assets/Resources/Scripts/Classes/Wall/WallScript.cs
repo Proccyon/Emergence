@@ -21,13 +21,14 @@ namespace WallSpace
 
     //Name: Name of the wall.
     //Solid: If Solid then actors can not move through the wall
-    //WallSprite: The sprite of the wall when facing East. Sprite is rotated based on rotation.
+    //WallSprite: The sprite of the wall when facing East. Sprite is rotated based on rotation when drawn.
     //PoleSprite: Sprite of the pole of the wall. Purely cosmetic a pole is placed at the end of a wall.
     //Rotation: Direction of wall. (0,-1) = facing south, (1,0) = facing east, (0,1) = facing north, (-1,0) = facing west.
     //FrontTile: The tile in front of the wall.
     //BackTile: The tile behind the wall.
+    //PolePriority: Decides which PoleSprite is shown when two walls are next to each other. Pole with highest PolePriority is shown.
 
-    public class Wall//(NOT DONE, NEED TO REFERENCE THIS IN FRONTTILE AND BACKTILE)
+    public class Wall
     {
         public string Name;
         public bool Solid;
@@ -36,31 +37,23 @@ namespace WallSpace
         public Tile FrontTile;
         public Tile BackTile;
         public Vector2Int Rotation;
+        public int PolePriority;
         public static readonly Dictionary<Vector2Int, Wall> EmptyWallDict = new Dictionary<Vector2Int, Wall>(){ {Vector2Int.down,null},{Vector2Int.up,null},{Vector2Int.left,null},{Vector2Int.right,null}};
 
 
         //Main constructor
-        public Wall(Tile FrontTile, Tile BackTile,string Name = "", Sprite WallSprite = null,Sprite PoleSprite = null,bool Solid=false )
+        //ReferenceTile can be any tile next to the wall, there are two options
+        //Direction is a 2d vector pointing from ReferenceTile to the wall
+        //Rotation is a 2d vector pointing in the direction the wall is looking at
+        public Wall(Tile ReferenceTile, Vector2Int Direction,Vector2Int Rotation,string Name = "", Sprite WallSprite = null,Sprite PoleSprite = null,bool Solid=false,int PolePriority = 0 )
         {
             this.Name = Name;
             this.Solid = Solid;
             this.WallSprite = WallSprite;
             this.PoleSprite = PoleSprite;
-
-            //Checks if given FrontTile and BackTile can contain the wall
-            if(Methods.CanMoveWall(this,FrontTile,BackTile))
-            {
-                //Move wall to given FrontTile and BackTile(Sets the references within the tiles etc.)
-                Methods.MoveWall(this,FrontTile,BackTile);
-            }
-            else
-            {
-                //If Given Tiles can not be moved to then set tiles to null
-                this.FrontTile = null;
-                this.BackTile = null;
-                this.Rotation = Vector2Int.zero;
-            }
-
+            this.PolePriority = PolePriority;
+            //Moves the wall to the given position and sets all refrences
+            Methods.MoveWall(this,ReferenceTile,Direction,Rotation);
         }
         
         //Checks if FrontTile ancd BackTile are indeed next to each other
@@ -139,7 +132,12 @@ namespace WallSpace
         }
     }
 
-
+    //WallSpawner are placed inside a structure. They spawn a wall when initializing a room.
+    //Name: Name of the wallSpawner.
+    //WallSpawnerSprite: The sprite of the WallSpawner when facing East. 
+    //Rotation: Direction of wall. (0,-1) = facing south, (1,0) = facing east, (0,1) = facing north, (-1,0) = facing west.
+    //FrontTileSpawner: The tileSpawner in front of the wall.
+    //BackTileSpawner: The tileSpawner behind the wall.
     public class WallSpawner
     {
         public string Name;
@@ -150,6 +148,7 @@ namespace WallSpace
 
         public static readonly Dictionary<Vector2Int, WallSpawner> EmptyWallSpawnerDict = new Dictionary<Vector2Int, WallSpawner>() { { Vector2Int.down, null }, { Vector2Int.up, null }, { Vector2Int.left, null }, { Vector2Int.right, null } };
 
+        //Currently only used in Methods.LoadStructure. X and Y are the position of the prefab in the editor(-0.5 see LoadStructure).
         public WallSpawner(Structure Structure,float X,float Y, Vector2Int Rotation, string Name = "", Sprite WallSpawnerSprite=null)
         {
             
@@ -157,39 +156,37 @@ namespace WallSpace
             this.WallSpawnerSprite = WallSpawnerSprite;
             this.Rotation = Rotation;
 
+            //Positions of FrontTile and BackTile
             int FrontX = (int)(X + Rotation.x * 0.5);
             int FrontY = (int)(Y + Rotation.y * 0.5);
             int BackX = (int)(X - Rotation.x * 0.5);
             int BackY = (int)(Y - Rotation.y * 0.5);
 
+            //Checks if FrontTile is inside the room, if not set it to null
             if(Methods.IsInsideRoom(Structure.Width,Structure.Height,FrontX,FrontY))
             {
                 this.FrontTileSpawner = Structure.TileSpawnerArray[FrontX, FrontY];
+                this.FrontTileSpawner.WallSpawnerDict[Rotation * -1] = this;
             }
             else
             {
                 this.FrontTileSpawner = null;
             }
+            //Checks if BackTile is inside the room, if not set it to null
             if (Methods.IsInsideRoom(Structure.Width, Structure.Height, BackX, BackY))
             {
                 this.BackTileSpawner = Structure.TileSpawnerArray[BackX, BackY];
+                this.BackTileSpawner.WallSpawnerDict[Rotation] = this;
             }
             else
             {
                 this.BackTileSpawner = null;
             }
-            
-
-            if ((FrontTileSpawner == null || FrontTileSpawner.WallSpawnerDict[Rotation * -1] == null) && (BackTileSpawner == null || BackTileSpawner.WallSpawnerDict[Rotation] == null))
-            {
-
-                FrontTileSpawner.WallSpawnerDict[this.Rotation * -1] = this;
-                BackTileSpawner.WallSpawnerDict[this.Rotation] = this;
-            }           
+                  
         }
 
-
-        public virtual Wall SpawnWall(Tile FrontTile, Tile BackTile)
+        //This method is overriden in child WallSpawners. It initializes a Wall at the given position
+        public virtual Wall SpawnWall(Tile ReferenceTile, Vector2Int Direction)
         {
             return null;
         }
